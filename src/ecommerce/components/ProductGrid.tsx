@@ -58,7 +58,7 @@ const ProductGrid = ({
       description:
         "High-quality cotton t-shirt with a comfortable fit and stylish design.",
       image:
-        "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
+        "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&q=90",
       price: 29.99,
       compareAtPrice: 39.99,
       rating: 4.5,
@@ -73,7 +73,7 @@ const ProductGrid = ({
       description:
         "Classic slim fit jeans that offer both style and comfort for everyday wear.",
       image:
-        "https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&q=80",
+        "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=500&q=90",
       price: 49.99,
       compareAtPrice: 69.99,
       rating: 4.2,
@@ -87,7 +87,7 @@ const ProductGrid = ({
       description:
         "Premium wireless headphones with noise cancellation and long battery life.",
       image:
-        "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+        "https://images.unsplash.com/photo-1505751172876-fa1923c5c528?w=500&q=90",
       price: 129.99,
       rating: 4.8,
       isFeatured: true,
@@ -100,7 +100,7 @@ const ProductGrid = ({
       description:
         "Handcrafted genuine leather wallet with multiple card slots and coin pocket.",
       image:
-        "https://images.unsplash.com/photo-1627123424574-724758594e93?w=500&q=80",
+        "https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=500&q=90",
       price: 34.99,
       compareAtPrice: 44.99,
       rating: 4.3,
@@ -114,7 +114,7 @@ const ProductGrid = ({
       description:
         "Feature-packed smartwatch with health tracking, notifications, and customizable faces.",
       image:
-        "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+        "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=500&q=90",
       price: 199.99,
       rating: 4.6,
       isNew: true,
@@ -128,7 +128,7 @@ const ProductGrid = ({
       description:
         "Lightweight and comfortable running shoes with superior cushioning and support.",
       image:
-        "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80",
+        "https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=500&q=90",
       price: 89.99,
       compareAtPrice: 109.99,
       rating: 4.7,
@@ -141,7 +141,7 @@ const ProductGrid = ({
   showFilters = true,
   showSorting = true,
   showViewToggle = true,
-  columns = 3,
+  columns = 5,
   maxItems = 12,
   isLoading = false,
   onAddToCart = () => {},
@@ -149,7 +149,7 @@ const ProductGrid = ({
 }: ProductGridProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [sortOption, setSortOption] = useState("featured");
-  const [filterOpen, setFilterOpen] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(true);
 
   // Limit products to maxItems
   const displayProducts = products.slice(0, maxItems);
@@ -349,6 +349,8 @@ const ProductGrid = ({
             columns === 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
             columns === 4 &&
               "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
+            columns === 5 &&
+              "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
           )}
         >
           {displayProducts.map((product) => (

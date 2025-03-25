@@ -47,7 +47,7 @@ const ProductCard = ({
   name = "Premium Cotton T-Shirt",
   slug = "premium-cotton-t-shirt",
   description = "High-quality cotton t-shirt with a comfortable fit and stylish design.",
-  image = "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80",
+  image = "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=500&q=90",
   price = 29.99,
   compareAtPrice = 39.99,
   rating = 4.5,
@@ -86,7 +86,7 @@ const ProductCard = ({
     : 0;
 
   return (
-    <Card className="h-full overflow-hidden transition-all duration-200 hover:shadow-lg bg-white">
+    <Card className="h-full overflow-hidden transition-all duration-300 hover:shadow-xl bg-white border-0 rounded-xl">
       <div className="relative">
         {/* Product badges */}
         <div className="absolute left-2 top-2 z-10 flex flex-col gap-1">
@@ -107,11 +107,11 @@ const ProductCard = ({
         </button>
 
         {/* Product image */}
-        <div className="relative aspect-square overflow-hidden bg-gray-100">
+        <div className="relative aspect-square overflow-hidden bg-gray-100 rounded-lg shadow-md">
           <img
             src={image}
             alt={name}
-            className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+            className="h-full w-full object-cover transition-all duration-500 hover:scale-110 hover:brightness-110"
           />
         </div>
       </div>

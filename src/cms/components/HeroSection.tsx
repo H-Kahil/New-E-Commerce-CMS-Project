@@ -27,7 +27,7 @@ const HeroSection = ({
       title: "Summer Collection 2023",
       subtitle: "Discover the latest trends for the season",
       imageUrl:
-        "https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=1400&q=80",
+        "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1400&q=90",
       ctaText: "Shop Now",
       ctaLink: "/collections/summer",
       language: "en",
@@ -37,7 +37,7 @@ const HeroSection = ({
       title: "New Arrivals",
       subtitle: "Be the first to explore our newest products",
       imageUrl:
-        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1400&q=80",
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=90",
       ctaText: "Explore",
       ctaLink: "/new-arrivals",
       language: "en",
@@ -47,7 +47,7 @@ const HeroSection = ({
       title: "Special Offers",
       subtitle: "Limited time discounts on selected items",
       imageUrl:
-        "https://images.unsplash.com/photo-1607082349566-187342175e2f?w=1400&q=80",
+        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&q=90",
       ctaText: "View Offers",
       ctaLink: "/offers",
       language: "en",
@@ -94,7 +94,7 @@ const HeroSection = ({
   };
 
   return (
-    <div className="relative w-full h-[500px] overflow-hidden bg-gray-100">
+    <div className="relative w-full h-[600px] overflow-hidden bg-gray-100 shadow-xl rounded-lg">
       {/* Slides */}
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
@@ -107,11 +107,14 @@ const HeroSection = ({
           >
             {/* Background Image */}
             <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: `url(${slide.imageUrl})` }}
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+              style={{
+                backgroundImage: `url(${slide.imageUrl})`,
+                backgroundPosition: "center 30%",
+              }}
             >
               {/* Overlay for better text readability */}
-              <div className="absolute inset-0 bg-black/30"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/20"></div>
             </div>
 
             {/* Content */}
