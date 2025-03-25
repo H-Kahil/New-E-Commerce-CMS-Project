@@ -131,6 +131,111 @@ export const cms = {
       .select("*, cms_ads(*)")
       .eq("locale", locale);
   },
+  getAdZoneByLocation: async (location: string, locale: string = "en") => {
+    return await supabase
+      .from("cms_ad_zones")
+      .select("*, cms_ads(*)")
+      .eq("location", location)
+      .eq("locale", locale)
+      .single();
+  },
+  getMenus: async (locale: string = "en") => {
+    // First get all menus
+    const { data: menus, error: menusError } = await supabase
+      .from("cms_menus")
+      .select("*")
+      .eq("locale", locale)
+      .order("order", { ascending: true });
+
+    if (menusError || !menus) return { data: null, error: menusError };
+
+    // Get menu items for each menu with their nested structure
+    const menusWithItems = await Promise.all(
+      menus.map(async (menu) => {
+        // Get top-level menu items
+        const { data: items, error: itemsError } = await supabase
+          .from("cms_menu_items")
+          .select("*")
+          .eq("menu_id", menu.id)
+          .is("parent_id", null)
+          .eq("locale", locale)
+          .order("order", { ascending: true });
+
+        if (itemsError || !items) return { ...menu, items: [] };
+
+        // Get child items for each top-level item
+        const itemsWithChildren = await Promise.all(
+          items.map(async (item) => {
+            const { data: children, error: childrenError } = await supabase
+              .from("cms_menu_items")
+              .select("*")
+              .eq("parent_id", item.id)
+              .eq("locale", locale)
+              .order("order", { ascending: true });
+
+            return {
+              ...item,
+              children: childrenError ? [] : children,
+            };
+          }),
+        );
+
+        return {
+          ...menu,
+          items: itemsWithChildren,
+        };
+      }),
+    );
+
+    return { data: menusWithItems, error: null };
+  },
+  getMenuByLocation: async (location: string, locale: string = "en") => {
+    // First get the menu by location
+    const { data: menu, error: menuError } = await supabase
+      .from("cms_menus")
+      .select("*")
+      .eq("location", location)
+      .eq("locale", locale)
+      .single();
+
+    if (menuError || !menu) return { data: null, error: menuError };
+
+    // Get top-level menu items
+    const { data: items, error: itemsError } = await supabase
+      .from("cms_menu_items")
+      .select("*")
+      .eq("menu_id", menu.id)
+      .is("parent_id", null)
+      .eq("locale", locale)
+      .order("order", { ascending: true });
+
+    if (itemsError) return { data: { ...menu, items: [] }, error: itemsError };
+
+    // Get child items for each top-level item
+    const itemsWithChildren = await Promise.all(
+      items.map(async (item) => {
+        const { data: children, error: childrenError } = await supabase
+          .from("cms_menu_items")
+          .select("*")
+          .eq("parent_id", item.id)
+          .eq("locale", locale)
+          .order("order", { ascending: true });
+
+        return {
+          ...item,
+          children: childrenError ? [] : children,
+        };
+      }),
+    );
+
+    return {
+      data: {
+        ...menu,
+        items: itemsWithChildren,
+      },
+      error: null,
+    };
+  },
   getMedia: async (
     options: { type?: string; limit?: number; offset?: number } = {},
   ) => {

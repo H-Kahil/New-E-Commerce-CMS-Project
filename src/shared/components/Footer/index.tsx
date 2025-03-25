@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Mail,
@@ -13,6 +13,8 @@ import {
 import { cn } from "@/shared/utils";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/components/ui/input";
+import { cms } from "../../../services/supabase";
+import { useRtl } from "../../../contexts/RtlContext";
 
 interface FooterProps {
   columns?: FooterColumn[];
@@ -26,6 +28,7 @@ interface FooterColumn {
   links: {
     label: string;
     href: string;
+    target?: string;
   }[];
 }
 
@@ -40,8 +43,64 @@ interface SocialLink {
   href: string;
 }
 
+interface MenuItem {
+  id: string;
+  label: string;
+  url: string;
+  target?: string;
+  children?: MenuItem[];
+}
+
 const Footer = ({
-  columns = [
+  columns,
+  contactInfo = {
+    email: "support@example.com",
+    phone: "+1 (555) 123-4567",
+    address: "123 Commerce St, Shopping City, SC 12345",
+  },
+  socialLinks = [
+    { platform: "facebook", href: "https://facebook.com" },
+    { platform: "twitter", href: "https://twitter.com" },
+    { platform: "instagram", href: "https://instagram.com" },
+    { platform: "youtube", href: "https://youtube.com" },
+  ],
+  copyrightText = "© 2023 E-Commerce Store. All rights reserved.",
+}: FooterProps) => {
+  const [footerMenus, setFooterMenus] = useState<FooterColumn[]>([]);
+  const { language } = useRtl();
+
+  useEffect(() => {
+    const fetchFooterMenus = async () => {
+      try {
+        const { data, error } = await cms.getMenuByLocation("footer", language);
+        if (error) throw new Error(error.message);
+
+        if (data && data.items) {
+          // Transform the menu items into footer columns format
+          const transformedColumns = data.items.map((item: MenuItem) => ({
+            title: item.label,
+            links: item.children
+              ? item.children.map((child: MenuItem) => ({
+                  label: child.label,
+                  href: child.url,
+                  target: child.target,
+                }))
+              : [],
+          }));
+
+          setFooterMenus(transformedColumns);
+        }
+      } catch (err) {
+        console.error("Error fetching footer menus:", err);
+        // Fallback to default columns if fetch fails
+      }
+    };
+
+    fetchFooterMenus();
+  }, [language]);
+
+  // Default footer columns as fallback
+  const defaultColumns = [
     {
       title: "Shop",
       links: [
@@ -78,20 +137,12 @@ const Footer = ({
         { label: "Privacy Policy", href: "/privacy" },
       ],
     },
-  ],
-  contactInfo = {
-    email: "support@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Commerce St, Shopping City, SC 12345",
-  },
-  socialLinks = [
-    { platform: "facebook", href: "https://facebook.com" },
-    { platform: "twitter", href: "https://twitter.com" },
-    { platform: "instagram", href: "https://instagram.com" },
-    { platform: "youtube", href: "https://youtube.com" },
-  ],
-  copyrightText = "© 2023 E-Commerce Store. All rights reserved.",
-}: FooterProps) => {
+  ];
+
+  // Use fetched footer menus or fallback to default or provided columns
+  const displayColumns =
+    footerMenus.length > 0 ? footerMenus : columns || defaultColumns;
+
   const getSocialIcon = (platform: string) => {
     switch (platform) {
       case "facebook":
@@ -160,7 +211,7 @@ const Footer = ({
           </div>
 
           {/* Footer Navigation Columns */}
-          {columns.map((column, index) => (
+          {displayColumns.map((column, index) => (
             <div key={index}>
               <h3 className="text-xl font-semibold mb-4">{column.title}</h3>
               <ul className="space-y-2">
@@ -168,6 +219,7 @@ const Footer = ({
                   <li key={linkIndex}>
                     <Link
                       to={link.href}
+                      target={link.target || "_self"}
                       className="text-gray-600 hover:text-gray-900 flex items-center gap-1 group"
                     >
                       <ChevronRight className="h-4 w-4 opacity-0 group-hover:opacity-100 transition-opacity" />

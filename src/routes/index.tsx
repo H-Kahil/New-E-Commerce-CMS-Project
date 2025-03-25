@@ -14,6 +14,36 @@ import CMSPage from "../pages/CMSPage";
 import NotFoundPage from "../pages/NotFoundPage";
 import CMSIndexPage from "../pages/CMSIndexPage";
 
+// Add new route for Ad Management
+const AdManagementPage = () => (
+  <div className="container mx-auto px-4 py-12">
+    <h1 className="text-3xl font-bold mb-6">Ad Zone Management</h1>
+    <p className="text-gray-600 mb-8">
+      Manage your ad zones and advertisements across the site.
+    </p>
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <p className="text-center text-gray-500">
+        Ad management interface will be implemented here.
+      </p>
+    </div>
+  </div>
+);
+
+// Add new route for Menu Builder
+const MenuBuilderPage = () => (
+  <div className="container mx-auto px-4 py-12">
+    <h1 className="text-3xl font-bold mb-6">Menu Builder</h1>
+    <p className="text-gray-600 mb-8">
+      Create and manage navigation menus for your site.
+    </p>
+    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      <p className="text-center text-gray-500">
+        Menu builder interface will be implemented here.
+      </p>
+    </div>
+  </div>
+);
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -47,6 +77,14 @@ const router = createBrowserRouter([
       {
         path: "cms/page/:slug",
         element: <CMSPage />,
+      },
+      {
+        path: "cms/ads",
+        element: <AdManagementPage />,
+      },
+      {
+        path: "cms/menus",
+        element: <MenuBuilderPage />,
       },
       {
         path: "promotions",

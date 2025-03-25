@@ -75,22 +75,61 @@ const PromoBannerBlock = ({ data }: { data: any }) => (
   </div>
 );
 
-const AdZoneBlock = ({ data }: { data: any }) => (
-  <div className="mb-8">
-    {data.ad && (
+const AdZoneBlock = ({ data }: { data: any }) => {
+  const [adData, setAdData] = useState<any>(null);
+  const { language } = useRtl();
+
+  useEffect(() => {
+    const fetchAdZone = async () => {
+      if (!data.location) return;
+
+      try {
+        const { data: adZone, error } = await cms.getAdZoneByLocation(
+          data.location,
+          language,
+        );
+        if (error) throw new Error(error.message);
+
+        if (adZone && adZone.cms_ads && adZone.cms_ads.length > 0) {
+          // Filter active ads
+          const activeAds = adZone.cms_ads.filter((ad: any) => {
+            if (!ad.is_active) return false;
+
+            const now = new Date();
+            if (ad.start_date && new Date(ad.start_date) > now) return false;
+            if (ad.end_date && new Date(ad.end_date) < now) return false;
+
+            return true;
+          });
+
+          if (activeAds.length > 0) {
+            // For simplicity, just show the first active ad
+            setAdData(activeAds[0]);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching ad zone:", err);
+      }
+    };
+
+    fetchAdZone();
+  }, [data.location, language]);
+
+  if (!adData) return null;
+
+  return (
+    <div className="mb-8">
       <a
-        href={data.ad.link}
+        href={adData.link}
+        target="_blank"
+        rel="noopener noreferrer"
         className="block border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow"
       >
-        <img
-          src={data.ad.image}
-          alt={data.ad.title}
-          className="w-full h-auto"
-        />
+        <img src={adData.image} alt={adData.title} className="w-full h-auto" />
       </a>
-    )}
-  </div>
-);
+    </div>
+  );
+};
 
 const TextBlock = ({ data }: { data: any }) => (
   <div className="prose max-w-none mb-8">
