@@ -17,6 +17,73 @@ const HomePage: React.FC = () => {
   const [featuredProducts, setFeaturedProducts] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  // Mock data for development when Supabase is not available
+  const mockPageData = {
+    id: "mock-home-page",
+    title: "Home",
+    slug: "home",
+    sections: [
+      {
+        id: "mock-hero-section",
+        type: "hero",
+        blocks: [],
+      },
+      {
+        id: "mock-featured-categories",
+        type: "featured-categories",
+        blocks: [],
+      },
+    ],
+  };
+
+  const mockProducts = [
+    {
+      id: "mock-product-1",
+      name: "Mock Product 1",
+      slug: "mock-product-1",
+      description: "This is a mock product for development",
+      price: 99.99,
+      is_featured: true,
+      images: [
+        {
+          id: "mock-image-1",
+          url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
+          alt: "Mock Product 1",
+        },
+      ],
+    },
+    {
+      id: "mock-product-2",
+      name: "Mock Product 2",
+      slug: "mock-product-2",
+      description: "This is another mock product for development",
+      price: 149.99,
+      is_featured: true,
+      images: [
+        {
+          id: "mock-image-2",
+          url: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&q=80",
+          alt: "Mock Product 2",
+        },
+      ],
+    },
+    {
+      id: "mock-product-3",
+      name: "Mock Product 3",
+      slug: "mock-product-3",
+      description: "This is a third mock product for development",
+      price: 199.99,
+      is_featured: true,
+      images: [
+        {
+          id: "mock-image-3",
+          url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&q=80",
+          alt: "Mock Product 3",
+        },
+      ],
+    },
+  ];
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -43,11 +110,21 @@ const HomePage: React.FC = () => {
           // Don't throw error here, continue with other requests
         }
 
-        setPage(pageData || null);
-        setFeaturedProducts(productsData || []);
+        // If Supabase is not initialized, use mock data for development
+        if (!pageData && !productsData) {
+          console.warn("Using mock data for development");
+          setPage(mockPageData);
+          setFeaturedProducts(mockProducts);
+        } else {
+          setPage(pageData || null);
+          setFeaturedProducts(productsData || []);
+        }
       } catch (err: any) {
         console.error("Error fetching home page data:", err);
         setError(err.message);
+        // Fallback to mock data on error
+        setPage(mockPageData);
+        setFeaturedProducts(mockProducts);
       } finally {
         setLoading(false);
       }

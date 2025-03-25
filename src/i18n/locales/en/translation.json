@@ -15,7 +15,18 @@
     "backToHome": "Back to Home",
     "errorOccurred": "An error occurred. Please try again later.",
     "edit": "Edit",
-    "view": "View"
+    "view": "View",
+    "myAccount": "My Account",
+    "myOrders": "My Orders",
+    "contactUs": "Contact Us",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "submit": "Submit"
   },
   "header": {
     "searchPlaceholder": "Search for products...",

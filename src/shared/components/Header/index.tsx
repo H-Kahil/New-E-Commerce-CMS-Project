@@ -221,7 +221,7 @@ const Header = () => {
                     <div className="text-lg font-medium">Categories</div>
                     <div className="pl-2 space-y-2">
                       {displayMenuItems.map((item) => (
-                        <React.Fragment key={item.id}>
+                        <div key={item.id}>
                           <Link
                             to={item.url}
                             className={`block py-2 hover:text-primary ${item.title === "Promotions" ? "text-red-500 font-medium" : ""}`}
@@ -243,7 +243,7 @@ const Header = () => {
                               ))}
                             </div>
                           )}
-                        </React.Fragment>
+                        </div>
                       ))}
                       {/* CMS Link in Mobile Menu */}
                       <Link

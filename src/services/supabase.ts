@@ -5,10 +5,17 @@ import type { Database } from "../types/supabase";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Debug logs to check environment variables
+console.log("Environment check - Supabase URL exists:", !!supabaseUrl);
+console.log("Environment check - Supabase Anon Key exists:", !!supabaseAnonKey);
+
 // Check if credentials are available and log warning if not
 if (!supabaseUrl || !supabaseAnonKey) {
   console.warn(
     "Supabase credentials are missing. Please set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY environment variables.",
+  );
+  console.warn(
+    "To fix this issue, please go to the project settings on the home page and update the environment variables.",
   );
 }
 
@@ -17,6 +24,15 @@ export const supabase =
   supabaseUrl && supabaseAnonKey
     ? createClient<Database>(supabaseUrl, supabaseAnonKey)
     : (null as any); // Fallback to null with type assertion to prevent TypeScript errors
+
+// Log status for debugging
+if (supabase) {
+  console.log("Supabase client initialized successfully");
+} else {
+  console.warn(
+    "Supabase client initialization failed - using mock data where possible",
+  );
+}
 
 // Auth services
 export const auth = {
