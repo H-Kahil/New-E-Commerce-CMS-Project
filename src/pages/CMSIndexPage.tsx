@@ -99,6 +99,8 @@ const CMSIndexPage: React.FC = () => {
           await cms.getMenus(language);
         if (menusError) {
           console.error("Error fetching menus:", menusError);
+          // Log the error details for debugging
+          console.log("Menu error details:", JSON.stringify(menusError));
           // Continue with other requests instead of throwing
         }
         setMenus(menusData || []);

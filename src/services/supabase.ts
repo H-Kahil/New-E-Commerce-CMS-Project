@@ -150,8 +150,7 @@ export const cms = {
       return await supabase
         .from("cms_navigation")
         .select("*")
-        .eq("locale", locale)
-        .order("order", { ascending: true });
+        .eq("locale", locale);
     } catch (error) {
       console.error("Error in getNavigation:", error);
       return { data: null, error };
@@ -169,8 +168,7 @@ export const cms = {
         .from("cms_sections")
         .select("*")
         .eq("page_id", pageId)
-        .eq("locale", locale)
-        .order("order", { ascending: true });
+        .eq("locale", locale);
     } catch (error) {
       console.error("Error in getSections:", error);
       return { data: null, error };
@@ -187,8 +185,7 @@ export const cms = {
         .from("cms_blocks")
         .select("*")
         .eq("section_id", sectionId)
-        .eq("locale", locale)
-        .order("order", { ascending: true });
+        .eq("locale", locale);
     } catch (error) {
       console.error("Error in getBlocks:", error);
       return { data: null, error };
@@ -216,8 +213,7 @@ export const cms = {
         .from("cms_sections")
         .select("*")
         .eq("page_id", page.id)
-        .eq("locale", locale)
-        .order("order", { ascending: true });
+        .eq("locale", locale);
 
       if (sectionsError)
         return { data: { ...page, sections: [] }, error: sectionsError };
@@ -229,8 +225,7 @@ export const cms = {
             .from("cms_blocks")
             .select("*")
             .eq("section_id", section.id)
-            .eq("locale", locale)
-            .order("order", { ascending: true });
+            .eq("locale", locale);
 
           return {
             ...section,
@@ -296,8 +291,7 @@ export const cms = {
       const { data: menus, error: menusError } = await supabase
         .from("cms_menus")
         .select("*")
-        .eq("locale", locale)
-        .order("order", { ascending: true });
+        .eq("locale", locale);
 
       if (menusError || !menus) return { data: null, error: menusError };
 
@@ -310,8 +304,7 @@ export const cms = {
             .select("*")
             .eq("menu_id", menu.id)
             .is("parent_id", null)
-            .eq("locale", locale)
-            .order("order", { ascending: true });
+            .eq("locale", locale);
 
           if (itemsError || !items) return { ...menu, items: [] };
 
@@ -322,8 +315,7 @@ export const cms = {
                 .from("cms_menu_items")
                 .select("*")
                 .eq("parent_id", item.id)
-                .eq("locale", locale)
-                .order("order", { ascending: true });
+                .eq("locale", locale);
 
               return {
                 ...item,
@@ -368,8 +360,7 @@ export const cms = {
         .select("*")
         .eq("menu_id", menu.id)
         .is("parent_id", null)
-        .eq("locale", locale)
-        .order("order", { ascending: true });
+        .eq("locale", locale);
 
       if (itemsError)
         return { data: { ...menu, items: [] }, error: itemsError };
@@ -381,8 +372,7 @@ export const cms = {
             .from("cms_menu_items")
             .select("*")
             .eq("parent_id", item.id)
-            .eq("locale", locale)
-            .order("order", { ascending: true });
+            .eq("locale", locale);
 
           return {
             ...item,
