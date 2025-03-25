@@ -24,32 +24,32 @@ const HeroSection = ({
   slides = [
     {
       id: "1",
-      title: "Summer Collection 2023",
-      subtitle: "Discover the latest trends for the season",
+      title: "Luxury Fashion Collection",
+      subtitle: "Elevate your style with our premium designer pieces",
       imageUrl:
-        "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1400&q=90",
-      ctaText: "Shop Now",
-      ctaLink: "/collections/summer",
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=90",
+      ctaText: "Shop Collection",
+      ctaLink: "/collections/luxury",
       language: "en",
     },
     {
       id: "2",
-      title: "New Arrivals",
-      subtitle: "Be the first to explore our newest products",
+      title: "Summer Essentials",
+      subtitle: "Discover the perfect pieces for warm weather style",
       imageUrl:
-        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1400&q=90",
-      ctaText: "Explore",
-      ctaLink: "/new-arrivals",
+        "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1400&q=90",
+      ctaText: "Explore Now",
+      ctaLink: "/collections/summer",
       language: "en",
     },
     {
       id: "3",
-      title: "Special Offers",
-      subtitle: "Limited time discounts on selected items",
+      title: "Exclusive Limited Edition",
+      subtitle: "Handcrafted pieces that define modern elegance",
       imageUrl:
-        "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1400&q=90",
-      ctaText: "View Offers",
-      ctaLink: "/offers",
+        "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1400&q=90",
+      ctaText: "Shop Limited Edition",
+      ctaLink: "/collections/limited",
       language: "en",
     },
   ],
@@ -94,7 +94,7 @@ const HeroSection = ({
   };
 
   return (
-    <div className="relative w-full h-[600px] overflow-hidden bg-gray-100 shadow-xl rounded-lg">
+    <div className="relative w-full h-[700px] overflow-hidden bg-gray-100 shadow-xl rounded-lg">
       {/* Slides */}
       <div className="relative w-full h-full">
         {slides.map((slide, index) => (
@@ -107,27 +107,27 @@ const HeroSection = ({
           >
             {/* Background Image */}
             <div
-              className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+              className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-110"
               style={{
                 backgroundImage: `url(${slide.imageUrl})`,
                 backgroundPosition: "center 30%",
               }}
             >
               {/* Overlay for better text readability */}
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 to-black/20"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
             </div>
 
             {/* Content */}
-            <div className="relative z-20 flex flex-col items-center justify-center h-full text-center px-4 md:px-8 lg:px-16 text-white">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+            <div className="relative z-20 flex flex-col items-start justify-center h-full text-left px-8 md:px-16 lg:px-24 text-white max-w-3xl">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 {slide.title}
               </h1>
-              <p className="text-lg md:text-xl mb-8 max-w-2xl">
+              <p className="text-lg md:text-xl lg:text-2xl mb-10 max-w-2xl font-light">
                 {slide.subtitle}
               </p>
               <Button
                 size="lg"
-                className="bg-white text-black hover:bg-gray-200 hover:text-black"
+                className="bg-white text-black hover:bg-gray-200 hover:text-black text-lg px-8 py-6 h-auto"
                 asChild
               >
                 <a href={slide.ctaLink}>{slide.ctaText}</a>
@@ -142,30 +142,30 @@ const HeroSection = ({
         <>
           <button
             onClick={goToPrevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 rounded-full p-2 backdrop-blur-sm transition-colors"
+            className="absolute left-6 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 rounded-full p-3 backdrop-blur-sm transition-colors"
             aria-label="Previous slide"
           >
-            <ChevronLeft className="h-6 w-6 text-white" />
+            <ChevronLeft className="h-8 w-8 text-white" />
           </button>
           <button
             onClick={goToNextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 rounded-full p-2 backdrop-blur-sm transition-colors"
+            className="absolute right-6 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/40 rounded-full p-3 backdrop-blur-sm transition-colors"
             aria-label="Next slide"
           >
-            <ChevronRight className="h-6 w-6 text-white" />
+            <ChevronRight className="h-8 w-8 text-white" />
           </button>
         </>
       )}
 
       {/* Indicators */}
       {showIndicators && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex space-x-2">
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex space-x-3">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
               className={cn(
-                "w-3 h-3 rounded-full transition-colors",
+                "w-4 h-4 rounded-full transition-colors",
                 index === currentSlide
                   ? "bg-white"
                   : "bg-white/40 hover:bg-white/60",

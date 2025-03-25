@@ -108,11 +108,13 @@ const ProductCard = ({
 
         {/* Product image */}
         <div className="relative aspect-square overflow-hidden bg-gray-100 rounded-lg shadow-md">
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-cover transition-all duration-500 hover:scale-110 hover:brightness-110"
-          />
+          <a href={`/product/${id}`}>
+            <img
+              src={image}
+              alt={name}
+              className="h-full w-full object-cover transition-all duration-500 hover:scale-110 hover:brightness-110"
+            />
+          </a>
         </div>
       </div>
 
@@ -124,7 +126,12 @@ const ProductCard = ({
             <span className="text-sm font-medium">{rating}</span>
           </div>
         </div>
-        <h3 className="mt-1 line-clamp-1 text-lg font-medium">{name}</h3>
+        <a
+          href={`/product/${id}`}
+          className="hover:text-primary transition-colors"
+        >
+          <h3 className="mt-1 line-clamp-1 text-lg font-medium">{name}</h3>
+        </a>
       </CardHeader>
 
       <CardContent className="p-4 pt-2">
@@ -146,7 +153,7 @@ const ProductCard = ({
             <TooltipTrigger asChild>
               <Button
                 onClick={() => onAddToCart(id, 1)}
-                className="w-full gap-2"
+                className="w-full gap-2 bg-primary hover:bg-primary/90"
               >
                 <ShoppingCart size={16} />
                 Add to Cart

@@ -7,6 +7,7 @@ import MainLayout from "../layouts/MainLayout";
 // Pages
 import HomePage from "../pages/HomePage";
 import ProductPage from "../pages/ProductPage";
+import ProductDetailPage from "../pages/ProductDetailPage";
 import CategoryPage from "../pages/CategoryPage";
 import CollectionPage from "../pages/CollectionPage";
 import CMSPage from "../pages/CMSPage";
@@ -26,6 +27,10 @@ const router = createBrowserRouter([
       {
         path: "products/:slug",
         element: <ProductPage />,
+      },
+      {
+        path: "product/:id",
+        element: <ProductDetailPage />,
       },
       {
         path: "category/:slug",

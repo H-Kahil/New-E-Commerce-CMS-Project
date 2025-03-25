@@ -42,7 +42,7 @@ interface ProductGridProps {
   showFilters?: boolean;
   showSorting?: boolean;
   showViewToggle?: boolean;
-  columns?: 2 | 3 | 4;
+  columns?: 2 | 3 | 4 | 5;
   maxItems?: number;
   isLoading?: boolean;
   onAddToCart?: (id: string, quantity: number) => void;
@@ -155,10 +155,10 @@ const ProductGrid = ({
   const displayProducts = products.slice(0, maxItems);
 
   return (
-    <div className="w-full bg-gray-50">
+    <div className="w-full bg-gray-50 p-6 rounded-xl">
       {/* Header section with title and subtitle */}
       {(title || subtitle) && (
-        <div className="mb-6 text-center">
+        <div className="mb-8 text-center">
           {title && (
             <h2 className="text-2xl font-bold text-gray-900 md:text-3xl">
               {title}
@@ -170,7 +170,7 @@ const ProductGrid = ({
 
       {/* Controls bar */}
       {(showFilters || showSorting || showViewToggle) && (
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white p-4 rounded-lg shadow-sm">
           <div className="flex items-center gap-2">
             {showFilters && (
               <Button
@@ -180,7 +180,7 @@ const ProductGrid = ({
                 className="flex items-center gap-2"
               >
                 <SlidersHorizontal size={16} />
-                Filters
+                {filterOpen ? "Hide Filters" : "Show Filters"}
               </Button>
             )}
           </div>
@@ -333,8 +333,8 @@ const ProductGrid = ({
 
       {/* Products display */}
       {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {Array.from({ length: 8 }).map((_, index) => (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, index) => (
             <div
               key={index}
               className="h-[400px] animate-pulse rounded-lg bg-gray-200"
@@ -344,7 +344,7 @@ const ProductGrid = ({
       ) : viewMode === "grid" ? (
         <div
           className={cn(
-            "grid gap-4",
+            "grid gap-6",
             columns === 2 && "grid-cols-1 sm:grid-cols-2",
             columns === 3 && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
             columns === 4 &&
@@ -375,18 +375,20 @@ const ProductGrid = ({
           ))}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {displayProducts.map((product) => (
             <div
               key={product.id}
               className="flex flex-col overflow-hidden rounded-lg border bg-white shadow-sm sm:flex-row"
             >
               <div className="relative h-48 w-full sm:h-auto sm:w-48">
-                <img
-                  src={product.image}
-                  alt={product.name}
-                  className="h-full w-full object-cover"
-                />
+                <a href={`/product/${product.id}`}>
+                  <img
+                    src={product.image}
+                    alt={product.name}
+                    className="h-full w-full object-cover transition-all duration-500 hover:scale-105"
+                  />
+                </a>
                 {product.isNew && (
                   <span className="absolute left-2 top-2 rounded-full bg-blue-500 px-2 py-1 text-xs font-medium text-white">
                     New
@@ -421,7 +423,12 @@ const ProductGrid = ({
                     </span>
                   </div>
                 </div>
-                <h3 className="mb-1 text-lg font-medium">{product.name}</h3>
+                <a
+                  href={`/products/${product.slug}`}
+                  className="hover:text-primary transition-colors"
+                >
+                  <h3 className="mb-1 text-lg font-medium">{product.name}</h3>
+                </a>
                 <p className="mb-4 flex-1 text-sm text-gray-600">
                   {product.description}
                 </p>
