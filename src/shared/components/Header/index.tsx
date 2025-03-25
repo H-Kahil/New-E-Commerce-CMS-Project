@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -55,6 +55,15 @@ const Header = ({
 
           {/* Search, Language Switcher, and Cart - Rearranged on Mobile */}
           <div className="flex items-center space-x-3 md:space-x-4">
+            {/* CMS Link - New */}
+            <Link
+              to="/cms"
+              className="hidden md:flex items-center text-sm font-medium hover:text-primary transition-colors"
+            >
+              <FileText className="h-4 w-4 mr-1" />
+              <span>CMS</span>
+            </Link>
+
             {/* Search Form - Hidden on Small Mobile */}
             <form
               onSubmit={handleSearchSubmit}
@@ -154,6 +163,14 @@ const Header = ({
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
                         Promotions
+                      </Link>
+                      {/* CMS Link in Mobile Menu - New */}
+                      <Link
+                        to="/cms"
+                        className="block py-2 hover:text-primary"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        CMS
                       </Link>
                     </div>
                   </div>

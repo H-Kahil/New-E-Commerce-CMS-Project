@@ -61,6 +61,91 @@ export const cms = {
       .eq("locale", locale)
       .order("order", { ascending: true });
   },
+  // New CMS functions
+  getSections: async (pageId: string, locale: string = "en") => {
+    return await supabase
+      .from("cms_sections")
+      .select("*")
+      .eq("page_id", pageId)
+      .eq("locale", locale)
+      .order("order", { ascending: true });
+  },
+  getBlocks: async (sectionId: string, locale: string = "en") => {
+    return await supabase
+      .from("cms_blocks")
+      .select("*")
+      .eq("section_id", sectionId)
+      .eq("locale", locale)
+      .order("order", { ascending: true });
+  },
+  getPageWithSectionsAndBlocks: async (slug: string, locale: string = "en") => {
+    // First get the page
+    const { data: page, error: pageError } = await supabase
+      .from("cms_pages")
+      .select("*")
+      .eq("slug", slug)
+      .eq("locale", locale)
+      .single();
+
+    if (pageError || !page) return { data: null, error: pageError };
+
+    // Get sections for this page
+    const { data: sections, error: sectionsError } = await supabase
+      .from("cms_sections")
+      .select("*")
+      .eq("page_id", page.id)
+      .eq("locale", locale)
+      .order("order", { ascending: true });
+
+    if (sectionsError)
+      return { data: { ...page, sections: [] }, error: sectionsError };
+
+    // Get blocks for each section
+    const sectionsWithBlocks = await Promise.all(
+      sections.map(async (section) => {
+        const { data: blocks, error: blocksError } = await supabase
+          .from("cms_blocks")
+          .select("*")
+          .eq("section_id", section.id)
+          .eq("locale", locale)
+          .order("order", { ascending: true });
+
+        return {
+          ...section,
+          blocks: blocksError ? [] : blocks,
+        };
+      }),
+    );
+
+    return {
+      data: {
+        ...page,
+        sections: sectionsWithBlocks,
+      },
+      error: null,
+    };
+  },
+  getAdZones: async (locale: string = "en") => {
+    return await supabase
+      .from("cms_ad_zones")
+      .select("*, cms_ads(*)")
+      .eq("locale", locale);
+  },
+  getMedia: async (
+    options: { type?: string; limit?: number; offset?: number } = {},
+  ) => {
+    const { type, limit = 20, offset = 0 } = options;
+
+    let query = supabase.from("cms_media").select("*");
+
+    if (type) {
+      query = query.eq("type", type);
+    }
+
+    return await query
+      .range(offset, offset + limit - 1)
+      .order("created_at", { ascending: false });
+  },
 };
 
 // Product services
