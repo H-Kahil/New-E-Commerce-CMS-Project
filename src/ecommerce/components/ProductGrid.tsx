@@ -424,7 +424,7 @@ const ProductGrid = ({
                   </div>
                 </div>
                 <a
-                  href={`/products/${product.slug}`}
+                  href={`/product/${product.id}`}
                   className="hover:text-primary transition-colors"
                 >
                   <h3 className="mb-1 text-lg font-medium">{product.name}</h3>

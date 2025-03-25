@@ -7,7 +7,7 @@ import { supabase } from "../services/supabase";
 interface ProductDetailPageProps {}
 
 const ProductDetailPage: React.FC<ProductDetailPageProps> = () => {
-  const { slug } = useParams<{ slug: string }>();
+  const { id } = useParams<{ id: string }>();
   const [product, setProduct] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -17,11 +17,11 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = () => {
       try {
         setLoading(true);
 
-        // Fetch the product by slug
+        // Fetch the product by id
         const { data: productData, error: productError } = await supabase
           .from("products")
           .select("*")
-          .eq("slug", slug)
+          .eq("id", id)
           .single();
 
         if (productError) throw productError;
@@ -100,10 +100,10 @@ const ProductDetailPage: React.FC<ProductDetailPageProps> = () => {
       }
     };
 
-    if (slug) {
+    if (id) {
       fetchProduct();
     }
-  }, [slug]);
+  }, [id]);
 
   const handleAddToCart = async (
     id: string,
