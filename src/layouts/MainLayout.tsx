@@ -61,7 +61,11 @@ const AdComponent = ({ adZone }: { adZone: AdZone }) => {
   );
 };
 
-const MainLayout: React.FC = () => {
+interface MainLayoutProps {
+  children?: React.ReactNode;
+}
+
+const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { t } = useTranslation();
   const { direction, language } = useRtl();
   const [adZones, setAdZones] = useState<Record<string, AdZone>>({});
@@ -70,7 +74,10 @@ const MainLayout: React.FC = () => {
     const fetchAdZones = async () => {
       try {
         const { data, error } = await cms.getAdZones(language);
-        if (error) throw new Error(error.message);
+        if (error) {
+          console.error("Error fetching ad zones:", error);
+          return;
+        }
 
         if (data) {
           // Convert array to object with location as key for easier access
@@ -105,7 +112,7 @@ const MainLayout: React.FC = () => {
           <AdComponent adZone={adZones["content-top"]} />
         )}
 
-        <Outlet />
+        {children || <Outlet />}
 
         {/* After content ad zone */}
         {adZones["content-bottom"] && (

@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useRtl } from "../../../contexts/RtlContext";
+import { cms } from "../../../services/supabase";
 import {
   Mail,
   Phone,
@@ -10,18 +13,6 @@ import {
   Youtube,
   ChevronRight,
 } from "lucide-react";
-import { cn } from "@/shared/utils";
-import { Button } from "@/shared/ui/button";
-import { Input } from "@/components/ui/input";
-import { cms } from "../../../services/supabase";
-import { useRtl } from "../../../contexts/RtlContext";
-
-interface FooterProps {
-  columns?: FooterColumn[];
-  contactInfo?: ContactInfo;
-  socialLinks?: SocialLink[];
-  copyrightText?: string;
-}
 
 interface FooterColumn {
   title: string;
@@ -32,56 +23,35 @@ interface FooterColumn {
   }[];
 }
 
-interface ContactInfo {
-  email: string;
-  phone: string;
-  address: string;
-}
-
-interface SocialLink {
-  platform: "facebook" | "twitter" | "instagram" | "youtube";
-  href: string;
-}
-
 interface MenuItem {
   id: string;
-  label: string;
+  title: string;
   url: string;
   target?: string;
   children?: MenuItem[];
 }
 
-const Footer = ({
-  columns,
-  contactInfo = {
-    email: "support@example.com",
-    phone: "+1 (555) 123-4567",
-    address: "123 Commerce St, Shopping City, SC 12345",
-  },
-  socialLinks = [
-    { platform: "facebook", href: "https://facebook.com" },
-    { platform: "twitter", href: "https://twitter.com" },
-    { platform: "instagram", href: "https://instagram.com" },
-    { platform: "youtube", href: "https://youtube.com" },
-  ],
-  copyrightText = "© 2023 E-Commerce Store. All rights reserved.",
-}: FooterProps) => {
+const Footer: React.FC = () => {
+  const { t } = useTranslation();
+  const { language, direction } = useRtl();
   const [footerMenus, setFooterMenus] = useState<FooterColumn[]>([]);
-  const { language } = useRtl();
 
   useEffect(() => {
     const fetchFooterMenus = async () => {
       try {
         const { data, error } = await cms.getMenuByLocation("footer", language);
-        if (error) throw new Error(error.message);
+        if (error) {
+          console.error("Error fetching footer menu:", error);
+          return;
+        }
 
         if (data && data.items) {
           // Transform the menu items into footer columns format
           const transformedColumns = data.items.map((item: MenuItem) => ({
-            title: item.label,
+            title: item.title,
             links: item.children
               ? item.children.map((child: MenuItem) => ({
-                  label: child.label,
+                  label: child.title,
                   href: child.url,
                   target: child.target,
                 }))
@@ -92,7 +62,6 @@ const Footer = ({
         }
       } catch (err) {
         console.error("Error fetching footer menus:", err);
-        // Fallback to default columns if fetch fails
       }
     };
 
@@ -139,9 +108,21 @@ const Footer = ({
     },
   ];
 
-  // Use fetched footer menus or fallback to default or provided columns
-  const displayColumns =
-    footerMenus.length > 0 ? footerMenus : columns || defaultColumns;
+  // Use fetched footer menus or fallback to default
+  const displayColumns = footerMenus.length > 0 ? footerMenus : defaultColumns;
+
+  const contactInfo = {
+    email: "support@example.com",
+    phone: "+1 (555) 123-4567",
+    address: "123 Commerce St, Shopping City, SC 12345",
+  };
+
+  const socialLinks = [
+    { platform: "facebook", href: "https://facebook.com" },
+    { platform: "twitter", href: "https://twitter.com" },
+    { platform: "instagram", href: "https://instagram.com" },
+    { platform: "youtube", href: "https://youtube.com" },
+  ];
 
   const getSocialIcon = (platform: string) => {
     switch (platform) {
@@ -159,7 +140,7 @@ const Footer = ({
   };
 
   return (
-    <footer className="bg-gray-100 w-full">
+    <footer className="bg-gray-100 w-full" dir={direction}>
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Newsletter Signup */}
@@ -170,14 +151,14 @@ const Footer = ({
               updates.
             </p>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Input
+              <input
                 type="email"
                 placeholder="Your email address"
-                className="flex-grow"
+                className="flex-grow px-4 py-2 rounded border"
               />
-              <Button type="submit" className="whitespace-nowrap">
+              <button className="bg-primary text-white px-4 py-2 rounded hover:bg-primary/90 transition-colors whitespace-nowrap">
                 Subscribe
-              </Button>
+              </button>
             </div>
 
             {/* Contact Information */}
@@ -250,7 +231,7 @@ const Footer = ({
               ))}
             </div>
             <div className="text-gray-600 text-center md:text-right">
-              {copyrightText}
+              © {new Date().getFullYear()} E-Commerce CMS. All rights reserved.
             </div>
           </div>
         </div>

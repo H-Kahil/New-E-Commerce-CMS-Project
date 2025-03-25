@@ -1,55 +1,43 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search, Menu, FileText } from "lucide-react";
+import { Search, Menu, FileText, ShoppingCart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/shared/utils";
 import LanguageSwitcher from "../LanguageSwitcher";
-import CartPreview from "../../../ecommerce/cart/CartPreview";
 import NavigationMenu from "../NavigationMenu";
 import { cms } from "../../../services/supabase";
 import { useRtl } from "../../../contexts/RtlContext";
 
 interface MenuItem {
   id: string;
-  label: string;
+  title: string;
   url: string;
   target?: string;
   children?: MenuItem[];
 }
 
-interface HeaderProps {
-  logo?: string;
-  isRTL?: boolean;
-  onSearch?: (query: string) => void;
-  currentLanguage?: "en" | "ar";
-  onLanguageChange?: (language: "en" | "ar") => void;
-}
-
-const Header = ({
-  logo = "E-Store",
-  isRTL = false,
-  onSearch = () => {},
-  currentLanguage = "en",
-  onLanguageChange = () => {},
-}: HeaderProps) => {
+const Header = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const { language } = useRtl();
+  const { language, direction } = useRtl();
 
   useEffect(() => {
     const fetchHeaderMenu = async () => {
       try {
         const { data, error } = await cms.getMenuByLocation("header", language);
-        if (error) throw new Error(error.message);
+        if (error) {
+          console.error("Error fetching header menu:", error);
+          return;
+        }
+
         if (data && data.items) {
           setMenuItems(data.items);
         }
       } catch (err) {
         console.error("Error fetching header menu:", err);
-        // Fallback to default menu items if fetch fails
       }
     };
 
@@ -58,66 +46,67 @@ const Header = ({
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSearch(searchQuery);
+    // Handle search
+    console.log("Search for:", searchQuery);
   };
 
   // Default menu items as fallback
   const defaultMenuItems: MenuItem[] = [
     {
       id: "1",
-      label: "Electronics",
+      title: "Electronics",
       url: "/category/electronics",
       children: [
         {
           id: "1-1",
-          label: "Smartphones",
+          title: "Smartphones",
           url: "/category/electronics/smartphones",
         },
-        { id: "1-2", label: "Laptops", url: "/category/electronics/laptops" },
+        { id: "1-2", title: "Laptops", url: "/category/electronics/laptops" },
         {
           id: "1-3",
-          label: "Accessories",
+          title: "Accessories",
           url: "/category/electronics/accessories",
         },
       ],
     },
     {
       id: "2",
-      label: "Clothing",
+      title: "Clothing",
       url: "/category/clothing",
       children: [
-        { id: "2-1", label: "Men", url: "/category/clothing/men" },
-        { id: "2-2", label: "Women", url: "/category/clothing/women" },
-        { id: "2-3", label: "Kids", url: "/category/clothing/kids" },
+        { id: "2-1", title: "Men", url: "/category/clothing/men" },
+        { id: "2-2", title: "Women", url: "/category/clothing/women" },
+        { id: "2-3", title: "Kids", url: "/category/clothing/kids" },
       ],
     },
     {
       id: "3",
-      label: "Home & Garden",
+      title: "Home & Garden",
       url: "/category/home-garden",
       children: [
         {
           id: "3-1",
-          label: "Furniture",
+          title: "Furniture",
           url: "/category/home-garden/furniture",
         },
-        { id: "3-2", label: "Decor", url: "/category/home-garden/decor" },
-        { id: "3-3", label: "Kitchen", url: "/category/home-garden/kitchen" },
+        { id: "3-2", title: "Decor", url: "/category/home-garden/decor" },
+        { id: "3-3", title: "Kitchen", url: "/category/home-garden/kitchen" },
       ],
     },
     {
       id: "4",
-      label: "Beauty",
+      title: "Beauty",
       url: "/category/beauty",
       children: [
-        { id: "4-1", label: "Skincare", url: "/category/beauty/skincare" },
-        { id: "4-2", label: "Makeup", url: "/category/beauty/makeup" },
-        { id: "4-3", label: "Fragrance", url: "/category/beauty/fragrance" },
+        { id: "4-1", title: "Skincare", url: "/category/beauty/skincare" },
+        { id: "4-2", title: "Makeup", url: "/category/beauty/makeup" },
+        { id: "4-3", title: "Fragrance", url: "/category/beauty/fragrance" },
       ],
     },
     {
       id: "5",
-      label: "Promotions",
+      title: "Promotions",
       url: "/promotions",
     },
   ];
@@ -129,7 +118,7 @@ const Header = ({
     <header
       className={cn(
         "sticky top-0 z-50 w-full bg-white border-b shadow-sm",
-        isRTL ? "direction-rtl" : "",
+        direction === "rtl" ? "direction-rtl" : "",
       )}
     >
       <div className="container mx-auto px-4">
@@ -137,7 +126,9 @@ const Header = ({
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="flex items-center">
-              <span className="text-xl font-bold text-primary">{logo}</span>
+              <span className="text-xl font-bold text-primary">
+                E-Commerce CMS
+              </span>
             </Link>
           </div>
 
@@ -180,13 +171,20 @@ const Header = ({
             </form>
 
             {/* Language Switcher */}
-            <LanguageSwitcher
-              currentLanguage={currentLanguage}
-              onLanguageChange={onLanguageChange}
-            />
+            <LanguageSwitcher />
 
-            {/* Cart Preview */}
-            <CartPreview />
+            {/* User Account */}
+            <Link to="/account" className="p-2">
+              <User className="h-5 w-5" />
+            </Link>
+
+            {/* Cart */}
+            <Link to="/cart" className="p-2 relative">
+              <ShoppingCart className="h-5 w-5" />
+              <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                0
+              </span>
+            </Link>
 
             {/* Mobile Menu Button */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -226,10 +224,10 @@ const Header = ({
                         <React.Fragment key={item.id}>
                           <Link
                             to={item.url}
-                            className={`block py-2 hover:text-primary ${item.label === "Promotions" ? "text-red-500 font-medium" : ""}`}
+                            className={`block py-2 hover:text-primary ${item.title === "Promotions" ? "text-red-500 font-medium" : ""}`}
                             onClick={() => setIsMobileMenuOpen(false)}
                           >
-                            {item.label}
+                            {item.title}
                           </Link>
                           {item.children && item.children.length > 0 && (
                             <div className="pl-4 space-y-2 mt-1 mb-3">
@@ -240,7 +238,7 @@ const Header = ({
                                   className="block py-1 text-sm hover:text-primary"
                                   onClick={() => setIsMobileMenuOpen(false)}
                                 >
-                                  {child.label}
+                                  {child.title}
                                 </Link>
                               ))}
                             </div>
@@ -253,7 +251,7 @@ const Header = ({
                         className="block py-2 hover:text-primary"
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        CMS
+                        CMS Dashboard
                       </Link>
                     </div>
                   </div>

@@ -1,59 +1,30 @@
-import React, { useState } from "react";
-import { Button } from "@/shared/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { cn } from "@/shared/utils";
+import React from "react";
+import { useTranslation } from "react-i18next";
+import { useRtl } from "../../../contexts/RtlContext";
 import { Globe } from "lucide-react";
 
-interface LanguageSwitcherProps {
-  currentLanguage?: "en" | "ar";
-  onLanguageChange?: (language: "en" | "ar") => void;
-}
-
-const LanguageSwitcher = ({
-  currentLanguage = "en",
-  onLanguageChange = () => {},
-}: LanguageSwitcherProps) => {
-  const [language, setLanguage] = useState<"en" | "ar">(currentLanguage);
+const LanguageSwitcher: React.FC = () => {
+  const { i18n } = useTranslation();
+  const { setDirection, setLanguage } = useRtl();
 
   const toggleLanguage = () => {
-    const newLanguage = language === "en" ? "ar" : "en";
-    setLanguage(newLanguage);
-    onLanguageChange(newLanguage);
+    const newLang = i18n.language === "en" ? "ar" : "en";
+    i18n.changeLanguage(newLang);
+    setLanguage(newLang);
+    setDirection(newLang === "ar" ? "rtl" : "ltr");
   };
 
   return (
-    <div className="flex items-center justify-center bg-white rounded-md p-1">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleLanguage}
-              className={cn(
-                "flex items-center gap-1 px-2 py-1 h-auto",
-                language === "ar" ? "flex-row-reverse" : "",
-              )}
-            >
-              <Globe className="h-4 w-4" />
-              <span className="font-medium">
-                {language === "en" ? "EN" : "AR"}
-              </span>
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>
-              {language === "en" ? "Switch to Arabic" : "Switch to English"}
-            </p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </div>
+    <button
+      onClick={toggleLanguage}
+      className="p-2 rounded-full hover:bg-gray-100 transition-colors flex items-center gap-1"
+      aria-label="Toggle language"
+    >
+      <Globe className="h-5 w-5" />
+      <span className="text-sm hidden md:inline">
+        {i18n.language === "ar" ? "AR" : "EN"}
+      </span>
+    </button>
   );
 };
 

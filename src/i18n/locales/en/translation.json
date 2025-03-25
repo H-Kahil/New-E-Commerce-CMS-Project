@@ -9,7 +9,13 @@
     "account": "Account",
     "login": "Login",
     "register": "Register",
-    "logout": "Logout"
+    "logout": "Logout",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundMessage": "Sorry, the page you are looking for does not exist.",
+    "backToHome": "Back to Home",
+    "errorOccurred": "An error occurred. Please try again later.",
+    "edit": "Edit",
+    "view": "View"
   },
   "header": {
     "searchPlaceholder": "Search for products...",
@@ -55,5 +61,17 @@
     "continueShopping": "Continue Shopping",
     "emptyCart": "Your cart is empty",
     "startShopping": "Start Shopping"
+  },
+  "cms": {
+    "dashboard": "CMS Dashboard",
+    "pages": "Pages",
+    "products": "Products",
+    "adManagement": "Ad Management",
+    "menuBuilder": "Menu Builder",
+    "createNewPage": "Create New Page",
+    "createNewProduct": "Create New Product",
+    "createAdZone": "Create Ad Zone",
+    "createNewAd": "Create New Ad",
+    "createNewMenu": "Create New Menu"
   }
 }
