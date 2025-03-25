@@ -1,0 +1,59 @@
+{
+  "common": {
+    "home": "الرئيسية",
+    "products": "المنتجات",
+    "categories": "الفئات",
+    "collections": "المجموعات",
+    "search": "بحث",
+    "cart": "سلة التسوق",
+    "account": "الحساب",
+    "login": "تسجيل الدخول",
+    "register": "إنشاء حساب",
+    "logout": "تسجيل الخروج"
+  },
+  "header": {
+    "searchPlaceholder": "ابحث عن المنتجات...",
+    "viewCart": "عرض السلة",
+    "checkout": "إتمام الشراء",
+    "emptyCart": "سلة التسوق فارغة"
+  },
+  "footer": {
+    "newsletter": "اشترك في نشرتنا الإخبارية",
+    "subscribeButton": "اشتراك",
+    "emailPlaceholder": "عنوان بريدك الإلكتروني",
+    "contactUs": "اتصل بنا",
+    "copyright": "© 2023 متجر التجارة الإلكترونية. جميع الحقوق محفوظة."
+  },
+  "home": {
+    "featuredProducts": "منتجات مميزة",
+    "newArrivals": "وصل حديثاً",
+    "shopByCategory": "تسوق حسب الفئة",
+    "viewAllCategories": "عرض كل الفئات",
+    "specialOffers": "عروض خاصة",
+    "joinNewsletter": "انضم إلى نشرتنا الإخبارية",
+    "newsletterSubtitle": "اشترك للحصول على آخر الأخبار والعروض الخاصة والتحديثات."
+  },
+  "product": {
+    "addToCart": "أضف إلى السلة",
+    "addToWishlist": "أضف إلى المفضلة",
+    "outOfStock": "غير متوفر",
+    "inStock": "متوفر",
+    "description": "الوصف",
+    "specifications": "المواصفات",
+    "reviews": "التقييمات",
+    "relatedProducts": "منتجات ذات صلة",
+    "price": "السعر",
+    "quantity": "الكمية"
+  },
+  "cart": {
+    "yourCart": "سلة التسوق الخاصة بك",
+    "subtotal": "المجموع الفرعي",
+    "shipping": "الشحن",
+    "tax": "الضريبة",
+    "total": "المجموع",
+    "proceedToCheckout": "المتابعة إلى الدفع",
+    "continueShopping": "مواصلة التسوق",
+    "emptyCart": "سلة التسوق فارغة",
+    "startShopping": "ابدأ التسوق"
+  }
+}

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/shared/utils";
 import ProductCard from "../ProductCard";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/shared/ui/button";
 import {
   Select,
   SelectContent,

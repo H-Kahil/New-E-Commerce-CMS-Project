@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { useRoutes, Routes, Route } from "react-router-dom";
-import HomePage from "./cms/pages/HomePage";
+import HomePage from "./pages/HomePage";
 import routes from "tempo-routes";
 
 function App() {

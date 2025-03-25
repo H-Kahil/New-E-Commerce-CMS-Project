@@ -1,0 +1,59 @@
+{
+  "common": {
+    "home": "Home",
+    "products": "Products",
+    "categories": "Categories",
+    "collections": "Collections",
+    "search": "Search",
+    "cart": "Cart",
+    "account": "Account",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout"
+  },
+  "header": {
+    "searchPlaceholder": "Search for products...",
+    "viewCart": "View Cart",
+    "checkout": "Checkout",
+    "emptyCart": "Your cart is empty"
+  },
+  "footer": {
+    "newsletter": "Subscribe to our newsletter",
+    "subscribeButton": "Subscribe",
+    "emailPlaceholder": "Your email address",
+    "contactUs": "Contact Us",
+    "copyright": "© 2023 E-Commerce Store. All rights reserved."
+  },
+  "home": {
+    "featuredProducts": "Featured Products",
+    "newArrivals": "New Arrivals",
+    "shopByCategory": "Shop by Category",
+    "viewAllCategories": "View all categories",
+    "specialOffers": "Special Offers",
+    "joinNewsletter": "Join Our Newsletter",
+    "newsletterSubtitle": "Subscribe to receive the latest news, special offers, and updates."
+  },
+  "product": {
+    "addToCart": "Add to Cart",
+    "addToWishlist": "Add to Wishlist",
+    "outOfStock": "Out of Stock",
+    "inStock": "In Stock",
+    "description": "Description",
+    "specifications": "Specifications",
+    "reviews": "Reviews",
+    "relatedProducts": "Related Products",
+    "price": "Price",
+    "quantity": "Quantity"
+  },
+  "cart": {
+    "yourCart": "Your Cart",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping",
+    "tax": "Tax",
+    "total": "Total",
+    "proceedToCheckout": "Proceed to Checkout",
+    "continueShopping": "Continue Shopping",
+    "emptyCart": "Your cart is empty",
+    "startShopping": "Start Shopping"
+  }
+}
