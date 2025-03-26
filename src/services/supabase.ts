@@ -581,11 +581,10 @@ export const products = {
         locale = "en",
       } = options;
 
+      // Changed from inner join to left join to include products without categories
       let query = supabase
         .from("products")
-        .select(
-          "*, product_categories!inner(*, categories(*)), product_images(*)",
-        )
+        .select("*, product_categories(*, categories(*)), product_images(*)")
         .eq("locale", locale);
 
       if (category) {
@@ -681,6 +680,7 @@ export const products = {
             sku,
             stock,
             locale,
+            is_featured: false, // Set default values for required fields
           },
         ])
         .select()
@@ -693,18 +693,40 @@ export const products = {
 
       // Insert categories if any
       if (categories.length > 0 && product) {
-        const productCategories = categories.map((categoryId: string) => ({
-          product_id: product.id,
-          category_id: categoryId,
-          locale,
-        }));
+        const productCategories = categories.map((categoryId: string) => {
+          // Get category slug for the join table
+          return {
+            product_id: product.id,
+            category_id: categoryId,
+            category_slug: "default", // This will be updated in a separate query
+            locale,
+          };
+        });
 
+        // Insert category relationships
         const { error: categoriesError } = await supabase
           .from("product_categories")
           .insert(productCategories);
 
         if (categoriesError) {
           console.error("Error linking categories:", categoriesError);
+        } else {
+          // Update category slugs for each relationship
+          for (const category of categories) {
+            const { data: categoryData } = await supabase
+              .from("categories")
+              .select("slug")
+              .eq("id", category)
+              .single();
+
+            if (categoryData) {
+              await supabase
+                .from("product_categories")
+                .update({ category_slug: categoryData.slug })
+                .eq("product_id", product.id)
+                .eq("category_id", category);
+            }
+          }
         }
       }
 
@@ -714,8 +736,7 @@ export const products = {
           product_id: product.id,
           url: image.url,
           alt: image.alt || product.title,
-          is_primary: index === 0,
-          sort_order: index,
+          position: index, // Use position instead of sort_order and is_primary
           locale,
         }));
 
@@ -790,6 +811,7 @@ export const products = {
           const productCategories = categories.map((categoryId: string) => ({
             product_id: id,
             category_id: categoryId,
+            category_slug: "default", // This will be updated in a separate query
             locale,
           }));
 
@@ -799,6 +821,23 @@ export const products = {
 
           if (categoriesError) {
             console.error("Error updating categories:", categoriesError);
+          } else {
+            // Update category slugs for each relationship
+            for (const category of categories) {
+              const { data: categoryData } = await supabase
+                .from("categories")
+                .select("slug")
+                .eq("id", category)
+                .single();
+
+              if (categoryData) {
+                await supabase
+                  .from("product_categories")
+                  .update({ category_slug: categoryData.slug })
+                  .eq("product_id", id)
+                  .eq("category_id", category);
+              }
+            }
           }
         }
       }
@@ -814,8 +853,7 @@ export const products = {
             product_id: id,
             url: image.url,
             alt: image.alt || updatedProduct.title,
-            is_primary: index === 0,
-            sort_order: index,
+            position: index, // Use position instead of sort_order and is_primary
             locale,
           }));
 
