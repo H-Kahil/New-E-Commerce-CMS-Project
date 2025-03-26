@@ -5,6 +5,7 @@ import { useRtl } from "@/contexts/RtlContext";
 import { products } from "@/services/supabase";
 import { Button } from "@/components/ui/button";
 import { Pencil, Eye, Trash2, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import CMSNavbar from "../components/CMSNavbar";
 
 const ProductsModule: React.FC = () => {
@@ -49,6 +50,16 @@ const ProductsModule: React.FC = () => {
     } catch (err: any) {
       console.error("Error deleting product:", err);
       alert(`Failed to delete product: ${err.message}`);
+    }
+  };
+
+  const getStockStatus = (stock: number) => {
+    if (stock > 10) {
+      return <Badge className="bg-blue-500">In Stock</Badge>;
+    } else if (stock > 0) {
+      return <Badge className="bg-yellow-500">Low Stock</Badge>;
+    } else {
+      return <Badge className="bg-red-500">Out of Stock</Badge>;
     }
   };
 
@@ -107,19 +118,31 @@ const ProductsModule: React.FC = () => {
               <thead>
                 <tr className="bg-gray-50">
                   <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.titleColumn", "Title")}
+                    {t("cms.products.imageColumn", "Image")}
                   </th>
                   <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.slugColumn", "Slug")}
+                    {t("cms.products.skuColumn", "SKU")}
                   </th>
                   <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.priceColumn", "Price")}
+                    {t("cms.products.nameColumn", "Name")}
                   </th>
                   <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.stockColumn", "Stock")}
+                    {t("cms.products.categoryColumn", "Category")}
                   </th>
                   <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.updatedAtColumn", "Updated At")}
+                    {t("cms.products.subCategoryColumn", "Sub Category")}
+                  </th>
+                  <th className="px-4 py-2 text-left border-b">
+                    {t("cms.products.quantityColumn", "Quantity")}
+                  </th>
+                  <th className="px-4 py-2 text-left border-b">
+                    {t("cms.products.costColumn", "Cost ($)")}
+                  </th>
+                  <th className="px-4 py-2 text-left border-b">
+                    {t("cms.products.priceColumn", "Price ($)")}
+                  </th>
+                  <th className="px-4 py-2 text-left border-b">
+                    {t("cms.products.statusColumn", "Status")}
                   </th>
                   <th className="px-4 py-2 text-center border-b">
                     {t("cms.products.actionsColumn", "Actions")}
@@ -127,52 +150,90 @@ const ProductsModule: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {productsList.map((product) => (
-                  <tr key={product.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 border-b">{product.title}</td>
-                    <td className="px-4 py-3 border-b">/{product.slug}</td>
-                    <td className="px-4 py-3 border-b">
-                      ${product.price.toFixed(2)}
-                    </td>
-                    <td className="px-4 py-3 border-b">{product.stock}</td>
-                    <td className="px-4 py-3 border-b">
-                      {new Date(product.updated_at).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3 border-b">
-                      <div className="flex justify-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            navigate(`/cms/products/view/${product.id}`)
-                          }
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          View
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            navigate(`/cms/products/edit/${product.id}`)
-                          }
-                        >
-                          <Pencil className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => handleDeleteProduct(product.id)}
-                        >
-                          <Trash2 className="h-4 w-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {productsList.map((product) => {
+                  // Get the first product image or use a placeholder
+                  const productImage =
+                    product.images && product.images.length > 0
+                      ? product.images[0].url
+                      : "https://api.dicebear.com/7.x/avataaars/svg?seed=" +
+                        product.id;
+
+                  // Get cost from compare_at_price or use a default
+                  const cost =
+                    product.compare_at_price ||
+                    (product.price * 0.7).toFixed(2);
+
+                  // Get category and subcategory
+                  const category =
+                    product.categories && product.categories.length > 0
+                      ? product.categories[0].name
+                      : "Uncategorized";
+
+                  const subCategory =
+                    product.categories && product.categories.length > 1
+                      ? product.categories[1].name
+                      : "General";
+
+                  return (
+                    <tr key={product.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 border-b">
+                        <img
+                          src={productImage}
+                          alt={product.title}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                      </td>
+                      <td className="px-4 py-3 border-b">
+                        {product.sku || `PRD-${product.id.substring(0, 3)}`}
+                      </td>
+                      <td className="px-4 py-3 border-b">{product.title}</td>
+                      <td className="px-4 py-3 border-b">{category}</td>
+                      <td className="px-4 py-3 border-b">{subCategory}</td>
+                      <td className="px-4 py-3 border-b">
+                        {product.stock || 0}
+                      </td>
+                      <td className="px-4 py-3 border-b">${cost}</td>
+                      <td className="px-4 py-3 border-b">
+                        ${product.price.toFixed(2)}
+                      </td>
+                      <td className="px-4 py-3 border-b">
+                        {getStockStatus(product.stock)}
+                      </td>
+                      <td className="px-4 py-3 border-b">
+                        <div className="flex justify-center space-x-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              navigate(`/cms/products/view/${product.id}`)
+                            }
+                            className="h-8 w-8 p-0"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() =>
+                              navigate(`/cms/products/edit/${product.id}`)
+                            }
+                            className="h-8 w-8 p-0"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            onClick={() => handleDeleteProduct(product.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
