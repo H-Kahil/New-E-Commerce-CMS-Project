@@ -226,17 +226,26 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false, create = false }) => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  // State for editing page title and slug - moved up to maintain hooks order
+  const [editTitle, setEditTitle] = useState("");
+  const [editSlug, setEditSlug] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPage = async () => {
       if (create) {
         // For create page, set a default empty page structure
-        setPage({
+        const newPage = {
           title: "New Page",
           slug: "",
           content: "",
           sections: [],
-        });
+        };
+        setPage(newPage);
+        setEditTitle(newPage.title);
+        setEditSlug(newPage.slug);
+        setEditContent(newPage.content);
         setLoading(false);
         return;
       }
@@ -258,6 +267,9 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false, create = false }) => {
         if (!data) throw new Error("Page not found");
 
         setPage(data);
+        setEditTitle(data.title || "");
+        setEditSlug(data.slug || "");
+        setEditContent(data.content || "");
       } catch (err: any) {
         console.error("Error fetching CMS page:", err);
         setError(err.message || "Page not found");
@@ -298,20 +310,7 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false, create = false }) => {
     );
   }
 
-  // State for editing page title and slug
-  const [editTitle, setEditTitle] = useState("");
-  const [editSlug, setEditSlug] = useState("");
-  const [editContent, setEditContent] = useState("");
-  const navigate = useNavigate();
-
-  // Initialize edit fields when page data is loaded
-  useEffect(() => {
-    if (page) {
-      setEditTitle(page.title || "");
-      setEditSlug(page.slug || "");
-      setEditContent(page.content || "");
-    }
-  }, [page]);
+  // Handle save functionality
 
   // Handle save functionality
   const handleSave = async () => {
