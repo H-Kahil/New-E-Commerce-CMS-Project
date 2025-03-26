@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileText, ShoppingBag, Image, Menu, Home } from "lucide-react";
+import { FileText, ShoppingBag, Image, Menu, Home, Layers } from "lucide-react";
 
 const CMSNavbar: React.FC = () => {
   const location = useLocation();
@@ -27,6 +27,11 @@ const CMSNavbar: React.FC = () => {
       name: "Categories",
       path: "/cms/categories",
       icon: <FileText className="h-4 w-4 mr-2" />,
+    },
+    {
+      name: "Variants",
+      path: "/cms/variants",
+      icon: <Layers className="h-4 w-4 mr-2" />,
     },
     { name: "Ads", path: "/cms/ads", icon: <Image className="h-4 w-4 mr-2" /> },
     {

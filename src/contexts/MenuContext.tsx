@@ -26,7 +26,7 @@ interface MenuContextType {
   refreshMenus: () => Promise<void>;
 }
 
-const MenuContext = createContext<MenuContextType>({
+export const MenuContext = createContext<MenuContextType>({
   menus: {},
   loading: true,
   error: null,
@@ -35,9 +35,7 @@ const MenuContext = createContext<MenuContextType>({
 
 export const useMenus = () => useContext(MenuContext);
 
-export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export function MenuProvider({ children }: { children: React.ReactNode }) {
   const [menus, setMenus] = useState<Record<string, Menu>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -85,6 +83,4 @@ export const MenuProvider: React.FC<{ children: React.ReactNode }> = ({
       {children}
     </MenuContext.Provider>
   );
-};
-
-export default MenuContext;
+}

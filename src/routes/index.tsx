@@ -18,6 +18,7 @@ import CMSDashboard from "../cms/pages/CMSDashboard";
 import PagesModule from "../cms/pages/PagesModule";
 import ProductsModule from "../cms/pages/ProductsModule";
 import CategoriesModule from "../cms/pages/CategoriesModule";
+import VariantsModule from "../cms/pages/VariantsModule";
 import AdsModule from "../cms/pages/AdsModule";
 import MenusModule from "../cms/pages/MenusModule";
 import CreateProduct from "../cms/pages/CreateProduct";
@@ -80,6 +81,10 @@ const router = createBrowserRouter([
       {
         path: "cms/categories",
         element: <CategoriesModule />,
+      },
+      {
+        path: "cms/variants",
+        element: <VariantsModule />,
       },
       {
         path: "cms/products/create",

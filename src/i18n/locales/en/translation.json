@@ -76,7 +76,45 @@
     "startShopping": "Start Shopping"
   },
   "cms": {
-    "dashboard": "CMS Dashboard",
+    "dashboard": {
+      "welcome": "Welcome to the CMS Dashboard",
+      "description": "Manage your website content, products, and more from this central dashboard.",
+      "pages": "Pages",
+      "pagesDescription": "Manage website pages and content",
+      "products": "Products",
+      "productsDescription": "Manage products and categories",
+      "ads": "Ad Management",
+      "adsDescription": "Manage ad zones and advertisements",
+      "menus": "Menu Management",
+      "menusDescription": "Manage navigation menus",
+      "quickTips": "Quick Tips",
+      "tip1": "Create new pages with custom layouts using the Pages module",
+      "tip2": "Manage your product catalog through the Products module",
+      "tip3": "Set up ad zones to display advertisements on your site",
+      "tip4": "Configure navigation menus to improve site usability"
+    },
+    "categories": {
+      "title": "Categories",
+      "createNew": "Create New Category",
+      "createFirst": "Create your first category",
+      "noCategories": "No categories found",
+      "nameEnColumn": "Name (English)",
+      "nameArColumn": "Name (Arabic)",
+      "slugColumn": "Slug",
+      "levelColumn": "Level",
+      "statusColumn": "Status",
+      "actionsColumn": "Actions"
+    },
+    "variants": {
+      "title": "Variants",
+      "createNew": "Create New Variant",
+      "createFirst": "Create your first variant",
+      "noVariants": "No variants found",
+      "nameColumn": "Variant Name",
+      "valuesColumn": "Variant Values",
+      "statusColumn": "Status",
+      "actionsColumn": "Actions"
+    },
     "pages": "Pages",
     "products": "Products",
     "adManagement": "Ad Management",

@@ -203,72 +203,87 @@ const CategoriesModule: React.FC = () => {
       const hasSubcategories =
         category.subcategories && category.subcategories.length > 0;
       const isExpanded = expandedCategories[category.id];
+      const rowClassName = !category.is_active
+        ? "text-gray-400 hover:bg-gray-50"
+        : "hover:bg-gray-50";
 
-      return (
-        <React.Fragment key={category.id}>
-          <tr
-            className={`hover:bg-gray-50 ${!category.is_active ? "text-gray-400" : ""}`}
-          >
-            <td className="px-4 py-3 border-b">
-              <div
-                className="flex items-center"
-                style={{ paddingLeft: `${depth * 20}px` }}
-              >
-                {hasSubcategories && (
-                  <button
-                    onClick={() => toggleExpand(category.id)}
-                    className="mr-2 focus:outline-none"
-                  >
-                    {isExpanded ? (
-                      <ChevronDown className="h-4 w-4" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4" />
-                    )}
-                  </button>
-                )}
-                {!hasSubcategories && <span className="w-6"></span>}
-                <span>{category.name_en || category.name}</span>
-              </div>
-            </td>
-            <td className="px-4 py-3 border-b">{category.name_ar || "-"}</td>
-            <td className="px-4 py-3 border-b">/{category.slug}</td>
-            <td className="px-4 py-3 border-b">{category.level}</td>
-            <td className="px-4 py-3 border-b">
-              <span
-                className={`px-2 py-1 rounded-full text-xs ${category.is_active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
-              >
-                {category.is_active ? "Active" : "Inactive"}
-              </span>
-            </td>
-            <td className="px-4 py-3 border-b">
-              <div className="flex justify-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleEditCategory(category)}
-                >
-                  <Pencil className="h-4 w-4 mr-1" />
-                  Edit
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                  onClick={() => handleDeleteCategory(category.id)}
-                >
-                  <Trash2 className="h-4 w-4 mr-1" />
-                  Delete
-                </Button>
-              </div>
-            </td>
-          </tr>
+      // Create an array of elements instead of using React.Fragment with className
+      const elements = [];
 
-          {/* Render subcategories if expanded */}
-          {hasSubcategories &&
-            isExpanded &&
-            renderCategoryTree(category.subcategories!, depth + 1)}
-        </React.Fragment>
+      // Add the main row
+      elements.push(
+        <tr key={`row-${category.id}`} className={rowClassName}>
+          <td className="px-4 py-3 border-b">
+            <div
+              className="flex items-center"
+              style={{ paddingLeft: `${depth * 20}px` }}
+            >
+              {hasSubcategories && (
+                <button
+                  onClick={() => toggleExpand(category.id)}
+                  className="mr-2 focus:outline-none"
+                >
+                  {isExpanded ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </button>
+              )}
+              {!hasSubcategories && <span className="w-6"></span>}
+              <span>{category.name_en || category.name}</span>
+            </div>
+          </td>
+          <td className="px-4 py-3 border-b">{category.name_ar || "-"}</td>
+          <td className="px-4 py-3 border-b">/{category.slug}</td>
+          <td className="px-4 py-3 border-b">{category.level}</td>
+          <td className="px-4 py-3 border-b">
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${category.is_active ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
+            >
+              {category.is_active ? "Active" : "Inactive"}
+            </span>
+          </td>
+          <td className="px-4 py-3 border-b">
+            <div className="flex justify-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleEditCategory(category)}
+              >
+                <Pencil className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                onClick={() => handleDeleteCategory(category.id)}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            </div>
+          </td>
+        </tr>,
       );
+
+      // Add subcategories if expanded
+      if (hasSubcategories && isExpanded) {
+        const subcategoryElements = renderCategoryTree(
+          category.subcategories!,
+          depth + 1,
+        );
+        subcategoryElements.forEach((element, index) => {
+          elements.push(
+            React.cloneElement(element, {
+              key: `subcat-${category.id}-${index}`,
+            }),
+          );
+        });
+      }
+
+      return <React.Fragment key={category.id}>{elements}</React.Fragment>;
     });
   };
 

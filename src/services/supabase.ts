@@ -619,9 +619,7 @@ export const products = {
       // Try to fetch by slug first (most common case)
       const { data, error } = await supabase
         .from("products")
-        .select(
-          "*, product_categories(*, categories(*)), product_images(*), product_variants(*)",
-        )
+        .select("*, product_categories(*, categories(*)), product_images(*)")
         .eq("slug", idOrSlug)
         .eq("locale", locale)
         .single();
@@ -635,7 +633,7 @@ export const products = {
           const { data: dataById, error: errorById } = await supabase
             .from("products")
             .select(
-              "*, product_categories(*, categories(*)), product_images(*), product_variants(*)",
+              "*, product_categories(*, categories(*)), product_images(*)",
             )
             .eq("id", idOrSlug)
             .eq("locale", locale)
@@ -849,7 +847,6 @@ export const products = {
       // Delete related records first
       await supabase.from("product_categories").delete().eq("product_id", id);
       await supabase.from("product_images").delete().eq("product_id", id);
-      await supabase.from("product_variants").delete().eq("product_id", id);
 
       // Delete the product
       const { data, error } = await supabase
@@ -1229,6 +1226,195 @@ export const products = {
         .order("name", { ascending: true });
     } catch (error) {
       console.error("Error in getCollections:", error);
+      return { data: null, error };
+    }
+  },
+};
+
+// Variants services
+export const variants = {
+  getVariants: async (locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      // Get all variants with their values
+      const { data, error } = await supabase
+        .from("variants")
+        .select("*, values:variant_values(*)")
+        .eq("locale", locale)
+        .order("name", { ascending: true });
+
+      return { data, error };
+    } catch (error) {
+      console.error("Error in getVariants:", error);
+      return { data: null, error };
+    }
+  },
+
+  getVariantById: async (id: string, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const { data, error } = await supabase
+        .from("variants")
+        .select("*, values:variant_values(*)")
+        .eq("id", id)
+        .eq("locale", locale)
+        .single();
+
+      return { data, error };
+    } catch (error) {
+      console.error("Error in getVariantById:", error);
+      return { data: null, error };
+    }
+  },
+
+  createVariant: async (variantData: any, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const { name, is_active, values = [] } = variantData;
+
+      // Insert the variant
+      const { data: variant, error: variantError } = await supabase
+        .from("variants")
+        .insert([
+          {
+            name,
+            is_active,
+            locale: locale || "en",
+          },
+        ])
+        .select()
+        .single();
+
+      if (variantError) {
+        console.error("Error creating variant:", variantError);
+        return { data: null, error: variantError };
+      }
+
+      // Insert values if any
+      if (values.length > 0 && variant) {
+        const variantValues = values.map((value: string) => ({
+          variant_id: variant.id,
+          value,
+          locale: locale || "en",
+          is_active: true,
+        }));
+
+        const { error: valuesError } = await supabase
+          .from("variant_values")
+          .insert(variantValues);
+
+        if (valuesError) {
+          console.error("Error adding variant values:", valuesError);
+          // Continue with the variant creation even if values fail
+        }
+      }
+
+      return { data: variant, error: null };
+    } catch (error) {
+      console.error("Error in createVariant:", error);
+      return { data: null, error };
+    }
+  },
+
+  updateVariant: async (
+    id: string,
+    variantData: any,
+    locale: string = "en",
+  ) => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const { name, is_active, values = [] } = variantData;
+
+      // Update the variant
+      const { data: updatedVariant, error: updateError } = await supabase
+        .from("variants")
+        .update({
+          name,
+          is_active,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .eq("locale", locale)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Error updating variant:", updateError);
+        return { data: null, error: updateError };
+      }
+
+      // Update values
+      if (updatedVariant) {
+        // First delete existing values
+        await supabase.from("variant_values").delete().eq("variant_id", id);
+
+        // Then insert new ones
+        if (values.length > 0) {
+          const variantValues = values.map((value: string) => ({
+            variant_id: id,
+            value,
+            locale: locale || "en",
+            is_active: true,
+          }));
+
+          const { error: valuesError } = await supabase
+            .from("variant_values")
+            .insert(variantValues);
+
+          if (valuesError) {
+            console.error("Error updating variant values:", valuesError);
+          }
+        }
+      }
+
+      return { data: updatedVariant, error: null };
+    } catch (error) {
+      console.error("Error in updateVariant:", error);
+      return { data: null, error };
+    }
+  },
+
+  deleteVariant: async (id: string, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      // Delete variant values first (cascade should handle this, but just to be safe)
+      await supabase.from("variant_values").delete().eq("variant_id", id);
+
+      // Then delete the variant
+      const { data, error } = await supabase
+        .from("variants")
+        .delete()
+        .eq("id", id)
+        .eq("locale", locale);
+
+      return { data, error };
+    } catch (error) {
+      console.error("Error in deleteVariant:", error);
       return { data: null, error };
     }
   },
