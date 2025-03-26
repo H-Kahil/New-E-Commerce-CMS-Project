@@ -12,9 +12,11 @@ import {
   Image,
   Menu,
   Tag,
+  Search,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 
 interface CMSPage {
   id: string;
@@ -62,6 +64,7 @@ const CMSIndexPage: React.FC = () => {
   const [menus, setMenus] = useState<Menu[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("pages");
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -284,12 +287,54 @@ const CMSIndexPage: React.FC = () => {
           },
         ];
 
+  // Filter content based on search term
+  const filteredPages = displayPages.filter(
+    (page) =>
+      page.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      page.slug.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const filteredProducts = displayProducts.filter(
+    (product) =>
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.slug.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const filteredAdZones = displayAdZones.filter(
+    (zone) =>
+      zone.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      zone.location.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
+  const filteredMenus = displayMenus.filter(
+    (menu) =>
+      menu.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      menu.location.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">
           {t("cms.dashboard") || "CMS Dashboard"}
         </h1>
+      </div>
+
+      {/* Search input */}
+      <div className="mb-6 relative">
+        <div className="relative">
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+            size={18}
+          />
+          <Input
+            type="text"
+            placeholder={t("cms.searchContent") || "Search content..."}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 w-full"
+          />
+        </div>
       </div>
 
       <Tabs
@@ -321,56 +366,59 @@ const CMSIndexPage: React.FC = () => {
             <h2 className="text-2xl font-semibold">
               {t("cms.pages") || "Pages"}
             </h2>
-            <Button
-              className="flex items-center gap-2"
-              onClick={() => {
-                alert(
-                  "Create New Page functionality will be implemented in a future update.",
-                );
-              }}
-            >
-              <FileText size={16} />
-              {t("cms.createNewPage") || "Create New Page"}
-            </Button>
+            <Link to="/cms/page/create">
+              <Button className="flex items-center gap-2">
+                <FileText size={16} />
+                {t("cms.createNewPage") || "Create New Page"}
+              </Button>
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayPages.map((page) => (
-              <div
-                key={page.id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2">{page.title}</h2>
-                  <p className="text-gray-500 text-sm mb-4">/{page.slug}</p>
+          {filteredPages.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-md">
+              <p className="text-gray-500">
+                {t("cms.noResults") || "No pages found matching your search."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredPages.map((page) => (
+                <div
+                  key={page.id}
+                  className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold mb-2">{page.title}</h2>
+                    <p className="text-gray-500 text-sm mb-4">/{page.slug}</p>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xs text-gray-400">
-                      {new Date(page.updated_at).toLocaleDateString()}
-                    </span>
-                    <div className="flex gap-2">
-                      <Link to={`/cms/page/edit/${page.slug}`}>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex items-center gap-1"
-                        >
-                          <Edit size={14} />
-                          <span>{t("common.edit") || "Edit"}</span>
-                        </Button>
-                      </Link>
-                      <Link to={`/cms/page/${page.slug}`}>
-                        <Button size="sm" className="flex items-center gap-1">
-                          <Eye size={14} />
-                          <span>{t("common.view") || "View"}</span>
-                        </Button>
-                      </Link>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-xs text-gray-400">
+                        {new Date(page.updated_at).toLocaleDateString()}
+                      </span>
+                      <div className="flex gap-2">
+                        <Link to={`/cms/page/edit/${page.slug}`}>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-1"
+                          >
+                            <Edit size={14} />
+                            <span>{t("common.edit") || "Edit"}</span>
+                          </Button>
+                        </Link>
+                        <Link to={`/cms/page/${page.slug}`}>
+                          <Button size="sm" className="flex items-center gap-1">
+                            <Eye size={14} />
+                            <span>{t("common.view") || "View"}</span>
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="products" className="mt-6">
@@ -391,48 +439,59 @@ const CMSIndexPage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayProducts.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2">
-                    {product.title}
-                  </h2>
-                  <p className="text-gray-500 text-sm mb-4">/{product.slug}</p>
+          {filteredProducts.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-md">
+              <p className="text-gray-500">
+                {t("cms.noResults") ||
+                  "No products found matching your search."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold mb-2">
+                      {product.title}
+                    </h2>
+                    <p className="text-gray-500 text-sm mb-4">
+                      /{product.slug}
+                    </p>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xs text-gray-400">
-                      {new Date(product.updated_at).toLocaleDateString()}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1"
-                        onClick={() => {
-                          alert(
-                            "Edit Product functionality will be implemented in a future update.",
-                          );
-                        }}
-                      >
-                        <Edit size={14} />
-                        <span>{t("common.edit") || "Edit"}</span>
-                      </Button>
-                      <Link to={`/product/${product.slug}`}>
-                        <Button size="sm" className="flex items-center gap-1">
-                          <Eye size={14} />
-                          <span>{t("common.view") || "View"}</span>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-xs text-gray-400">
+                        {new Date(product.updated_at).toLocaleDateString()}
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => {
+                            alert(
+                              "Edit Product functionality will be implemented in a future update.",
+                            );
+                          }}
+                        >
+                          <Edit size={14} />
+                          <span>{t("common.edit") || "Edit"}</span>
                         </Button>
-                      </Link>
+                        <Link to={`/product/${product.slug}`}>
+                          <Button size="sm" className="flex items-center gap-1">
+                            <Eye size={14} />
+                            <span>{t("common.view") || "View"}</span>
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="ads" className="mt-6">
@@ -467,48 +526,57 @@ const CMSIndexPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayAdZones.map((zone) => (
-              <div
-                key={zone.id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2">{zone.name}</h2>
-                  <p className="text-gray-500 text-sm mb-4">
-                    Location: {zone.location}
-                  </p>
+          {filteredAdZones.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-md">
+              <p className="text-gray-500">
+                {t("cms.noResults") ||
+                  "No ad zones found matching your search."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredAdZones.map((zone) => (
+                <div
+                  key={zone.id}
+                  className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold mb-2">{zone.name}</h2>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Location: {zone.location}
+                    </p>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xs text-gray-400">
-                      {new Date(zone.updated_at).toLocaleDateString()}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1"
-                        onClick={() => {
-                          alert(
-                            "Edit Ad Zone functionality will be implemented in a future update.",
-                          );
-                        }}
-                      >
-                        <Edit size={14} />
-                        <span>{t("common.edit") || "Edit"}</span>
-                      </Button>
-                      <Link to={`/cms/ads/${zone.id}`}>
-                        <Button size="sm" className="flex items-center gap-1">
-                          <Eye size={14} />
-                          <span>{t("common.view") || "View"}</span>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-xs text-gray-400">
+                        {new Date(zone.updated_at).toLocaleDateString()}
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => {
+                            alert(
+                              "Edit Ad Zone functionality will be implemented in a future update.",
+                            );
+                          }}
+                        >
+                          <Edit size={14} />
+                          <span>{t("common.edit") || "Edit"}</span>
                         </Button>
-                      </Link>
+                        <Link to={`/cms/ads/${zone.id}`}>
+                          <Button size="sm" className="flex items-center gap-1">
+                            <Eye size={14} />
+                            <span>{t("common.view") || "View"}</span>
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="menus" className="mt-6">
@@ -529,48 +597,56 @@ const CMSIndexPage: React.FC = () => {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {displayMenus.map((menu) => (
-              <div
-                key={menu.id}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
-              >
-                <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2">{menu.name}</h2>
-                  <p className="text-gray-500 text-sm mb-4">
-                    Location: {menu.location}
-                  </p>
+          {filteredMenus.length === 0 ? (
+            <div className="text-center py-8 bg-gray-50 rounded-md">
+              <p className="text-gray-500">
+                {t("cms.noResults") || "No menus found matching your search."}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredMenus.map((menu) => (
+                <div
+                  key={menu.id}
+                  className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                >
+                  <div className="p-6">
+                    <h2 className="text-xl font-semibold mb-2">{menu.name}</h2>
+                    <p className="text-gray-500 text-sm mb-4">
+                      Location: {menu.location}
+                    </p>
 
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="text-xs text-gray-400">
-                      {new Date(menu.updated_at).toLocaleDateString()}
-                    </span>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1"
-                        onClick={() => {
-                          alert(
-                            "Edit Menu functionality will be implemented in a future update.",
-                          );
-                        }}
-                      >
-                        <Edit size={14} />
-                        <span>{t("common.edit") || "Edit"}</span>
-                      </Button>
-                      <Link to={`/cms/menus/${menu.id}`}>
-                        <Button size="sm" className="flex items-center gap-1">
-                          <Eye size={14} />
-                          <span>{t("common.view") || "View"}</span>
+                    <div className="flex justify-between items-center mt-4">
+                      <span className="text-xs text-gray-400">
+                        {new Date(menu.updated_at).toLocaleDateString()}
+                      </span>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => {
+                            alert(
+                              "Edit Menu functionality will be implemented in a future update.",
+                            );
+                          }}
+                        >
+                          <Edit size={14} />
+                          <span>{t("common.edit") || "Edit"}</span>
                         </Button>
-                      </Link>
+                        <Link to={`/cms/menus/${menu.id}`}>
+                          <Button size="sm" className="flex items-center gap-1">
+                            <Eye size={14} />
+                            <span>{t("common.view") || "View"}</span>
+                          </Button>
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

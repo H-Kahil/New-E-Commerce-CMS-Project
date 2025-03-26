@@ -23,8 +23,9 @@ function App() {
           <Route path="category/:slug" element={<CategoryPage />} />
           <Route path="collection/:slug" element={<CollectionPage />} />
           <Route path="cms" element={<CMSIndexPage />} />
-          <Route path="cms/page/:slug" element={<CMSPage />} />
+          <Route path="cms/page/create" element={<CMSPage create={true} />} />
           <Route path="cms/page/edit/:slug" element={<CMSPage edit={true} />} />
+          <Route path="cms/page/:slug" element={<CMSPage />} />
           <Route path="cms/ads/:id" element={<CMSPage />} />
           <Route path="cms/menus/:id" element={<CMSPage />} />
           <Route path="cart" element={<div>Cart Page</div>} />

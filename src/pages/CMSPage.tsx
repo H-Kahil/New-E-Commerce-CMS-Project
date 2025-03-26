@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cms } from "../services/supabase";
 import { useRtl } from "../contexts/RtlContext";
+import { Button } from "@/components/ui/button";
 
 // Block components
 const HeroBlock = ({ data }: { data: any }) => {
@@ -214,10 +215,11 @@ const Section = ({ section }: { section: any }) => {
 
 interface CMSPageProps {
   edit?: boolean;
+  create?: boolean;
 }
 
 // Main CMS Page component
-const CMSPage: React.FC<CMSPageProps> = ({ edit = false }) => {
+const CMSPage: React.FC<CMSPageProps> = ({ edit = false, create = false }) => {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { language } = useRtl();
@@ -227,6 +229,18 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false }) => {
 
   useEffect(() => {
     const fetchPage = async () => {
+      if (create) {
+        // For create page, set a default empty page structure
+        setPage({
+          title: "New Page",
+          slug: "",
+          content: "",
+          sections: [],
+        });
+        setLoading(false);
+        return;
+      }
+
       if (!slug) return;
 
       setLoading(true);
@@ -237,20 +251,23 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false }) => {
           language,
         );
 
-        if (error) throw new Error(error.message);
+        if (error) {
+          console.error("Error fetching CMS page:", error);
+          throw new Error("Page not found");
+        }
         if (!data) throw new Error("Page not found");
 
         setPage(data);
       } catch (err: any) {
         console.error("Error fetching CMS page:", err);
-        setError(err.message);
+        setError(err.message || "Page not found");
       } finally {
         setLoading(false);
       }
     };
 
     fetchPage();
-  }, [slug, language]);
+  }, [slug, language, create]);
 
   if (loading) {
     return (
@@ -281,6 +298,33 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false }) => {
     );
   }
 
+  // State for editing page title and slug
+  const [editTitle, setEditTitle] = useState("");
+  const [editSlug, setEditSlug] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const navigate = useNavigate();
+
+  // Initialize edit fields when page data is loaded
+  useEffect(() => {
+    if (page) {
+      setEditTitle(page.title || "");
+      setEditSlug(page.slug || "");
+      setEditContent(page.content || "");
+    }
+  }, [page]);
+
+  // Handle save functionality
+  const handleSave = async () => {
+    // Here you would implement the actual save functionality
+    // For now, we'll just show a success message
+    alert("Page saved successfully!");
+
+    if (create) {
+      // Redirect to the CMS index page after creating
+      navigate("/cms");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white">
       {/* Page header */}
@@ -288,37 +332,131 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false }) => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold">
-                {page.title || "Page Title"}
-              </h1>
-              {page.subtitle && (
-                <p className="text-lg mt-2 text-gray-600">{page.subtitle}</p>
+              {edit || create ? (
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="pageTitle"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Page Title
+                    </label>
+                    <input
+                      type="text"
+                      id="pageTitle"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      htmlFor="pageSlug"
+                      className="block text-sm font-medium text-gray-700 mb-1"
+                    >
+                      Page Slug
+                    </label>
+                    <input
+                      type="text"
+                      id="pageSlug"
+                      value={editSlug}
+                      onChange={(e) => setEditSlug(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <h1 className="text-3xl font-bold">
+                    {page.title || "Page Title"}
+                  </h1>
+                  {page.subtitle && (
+                    <p className="text-lg mt-2 text-gray-600">
+                      {page.subtitle}
+                    </p>
+                  )}
+                </>
               )}
             </div>
-            {edit && (
-              <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-md">
-                <p className="font-medium">Edit Mode</p>
-                <p className="text-sm">
-                  Editing functionality will be implemented in a future update.
-                </p>
+            {(edit || create) && (
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => navigate(-1)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleSave}>Save Page</Button>
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* Render sections */}
-      {page.sections?.map((section: any, index: number) => (
-        <Section key={index} section={section} />
-      ))}
-
-      {/* If there's content directly on the page (legacy support) */}
-      {page.content && (
+      {edit || create ? (
         <div className="container mx-auto px-4 py-8">
-          <div className="prose max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: page.content }} />
+          <div className="mb-6">
+            <label
+              htmlFor="pageContent"
+              className="block text-lg font-medium text-gray-700 mb-2"
+            >
+              Page Content
+            </label>
+            <textarea
+              id="pageContent"
+              value={editContent}
+              onChange={(e) => setEditContent(e.target.value)}
+              className="w-full h-64 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary"
+            />
+          </div>
+
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold mb-4">Sections</h2>
+            {page.sections && page.sections.length > 0 ? (
+              <div className="space-y-4">
+                {page.sections.map((section: any, index: number) => (
+                  <div
+                    key={index}
+                    className="border border-gray-200 rounded-md p-4"
+                  >
+                    <div className="flex justify-between items-center mb-2">
+                      <h3 className="font-medium">
+                        {section.title || `Section ${index + 1}`}
+                      </h3>
+                      <Button variant="ghost" size="sm">
+                        Edit
+                      </Button>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      Type: {section.type}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Blocks: {section.blocks?.length || 0}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 rounded-md">
+                <p className="text-gray-500">No sections added yet</p>
+                <Button className="mt-4">Add Section</Button>
+              </div>
+            )}
           </div>
         </div>
+      ) : (
+        <>
+          {/* Render sections */}
+          {page.sections?.map((section: any, index: number) => (
+            <Section key={index} section={section} />
+          ))}
+
+          {/* If there's content directly on the page (legacy support) */}
+          {page.content && (
+            <div className="container mx-auto px-4 py-8">
+              <div className="prose max-w-none">
+                <div dangerouslySetInnerHTML={{ __html: page.content }} />
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

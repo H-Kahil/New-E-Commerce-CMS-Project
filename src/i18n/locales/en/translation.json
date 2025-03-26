@@ -26,7 +26,9 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "confirm": "Confirm",
-    "submit": "Submit"
+    "submit": "Submit",
+    "page": "Page",
+    "notFound": "not found"
   },
   "header": {
     "searchPlaceholder": "Search for products...",
@@ -83,6 +85,8 @@
     "createNewProduct": "Create New Product",
     "createAdZone": "Create Ad Zone",
     "createNewAd": "Create New Ad",
-    "createNewMenu": "Create New Menu"
+    "createNewMenu": "Create New Menu",
+    "searchContent": "Search content...",
+    "noResults": "No results found matching your search."
   }
 }
