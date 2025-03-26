@@ -1,15 +1,34 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { FileText, ShoppingBag, Image, Menu, Home } from "lucide-react";
 
 const CMSNavbar: React.FC = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navItems = [
-    { name: "Pages", path: "/cms/pages" },
-    { name: "Products", path: "/cms/products" },
-    { name: "Ads", path: "/cms/ads" },
-    { name: "Menus", path: "/cms/menus" },
+    {
+      name: "Dashboard",
+      path: "/cms",
+      icon: <Home className="h-4 w-4 mr-2" />,
+    },
+    {
+      name: "Pages",
+      path: "/cms/pages",
+      icon: <FileText className="h-4 w-4 mr-2" />,
+    },
+    {
+      name: "Products",
+      path: "/cms/products",
+      icon: <ShoppingBag className="h-4 w-4 mr-2" />,
+    },
+    { name: "Ads", path: "/cms/ads", icon: <Image className="h-4 w-4 mr-2" /> },
+    {
+      name: "Menus",
+      path: "/cms/menus",
+      icon: <Menu className="h-4 w-4 mr-2" />,
+    },
   ];
 
   return (
@@ -26,17 +45,21 @@ const CMSNavbar: React.FC = () => {
 
         <div className="flex overflow-x-auto pb-2">
           {navItems.map((item) => (
-            <Link
+            <Button
               key={item.path}
-              to={item.path}
-              className={`px-4 py-2 mr-2 rounded-md whitespace-nowrap ${
-                location.pathname.startsWith(item.path)
-                  ? "bg-primary text-white"
-                  : "bg-gray-100 hover:bg-gray-200 text-gray-800"
-              }`}
+              variant={
+                location.pathname === item.path ||
+                (item.path !== "/cms" &&
+                  location.pathname.startsWith(item.path))
+                  ? "default"
+                  : "ghost"
+              }
+              className="mr-2 whitespace-nowrap"
+              onClick={() => navigate(item.path)}
             >
+              {item.icon}
               {item.name}
-            </Link>
+            </Button>
           ))}
         </div>
       </div>

@@ -7,8 +7,6 @@ import ProductDetailPage from "./pages/ProductDetailPage";
 import ProductPage from "./pages/ProductPage";
 import CategoryPage from "./pages/CategoryPage";
 import CollectionPage from "./pages/CollectionPage";
-
-import CMSIndexPage from "./pages/CMSIndexPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
 // Import new CMS modules
@@ -35,6 +33,7 @@ function App() {
 
           {/* CMS routes */}
           <Route path="cms" element={<CMSDashboard />} />
+          <Route path="cms/dashboard" element={<CMSDashboard />} />
 
           {/* Pages module */}
           <Route path="cms/pages" element={<PagesModule />} />

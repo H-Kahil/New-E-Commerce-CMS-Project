@@ -12,7 +12,13 @@ import CategoryPage from "../pages/CategoryPage";
 import CollectionPage from "../pages/CollectionPage";
 import CMSPage from "../pages/CMSPage";
 import NotFoundPage from "../pages/NotFoundPage";
-import CMSIndexPage from "../pages/CMSIndexPage";
+import CMSDashboard from "../cms/pages/CMSDashboard";
+
+// CMS Pages
+import PagesModule from "../cms/pages/PagesModule";
+import CreatePage from "../cms/pages/CreatePage";
+import EditPage from "../cms/pages/EditPage";
+import ViewPage from "../cms/pages/ViewPage";
 
 // Add new route for Ad Management
 const AdManagementPage = () => (
@@ -72,12 +78,25 @@ const router = createBrowserRouter([
       },
       {
         path: "cms",
-        element: <CMSIndexPage />,
+        element: <CMSDashboard />,
       },
       {
-        path: "cms/page/:slug",
-        element: <CMSPage />,
+        path: "cms/pages",
+        element: <PagesModule />,
       },
+      {
+        path: "cms/pages/create",
+        element: <CreatePage />,
+      },
+      {
+        path: "cms/pages/edit/:slug",
+        element: <EditPage />,
+      },
+      {
+        path: "cms/pages/view/:slug",
+        element: <ViewPage />,
+      },
+
       {
         path: "cms/ads",
         element: <AdManagementPage />,
