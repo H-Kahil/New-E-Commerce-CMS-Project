@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useRtl } from "@/contexts/RtlContext";
-import { products, variants } from "@/services/supabase";
+import { products, variants, supabase } from "@/services/supabase";
 import { Wizard } from "@/components/ui/wizard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -84,7 +84,11 @@ const ProductWizard: React.FC = () => {
         setParentCategories(parentCats || []);
 
         // Fetch all categories for the complete list
-        const { data: allCats, error } = await products.getCategories(language);
+        // Use direct query to avoid ambiguous relationship error
+        const { data: allCats, error } = await supabase
+          .from("categories")
+          .select("*")
+          .eq("locale", language);
         if (error) throw error;
         setCategories(allCats || []);
       } catch (err) {
