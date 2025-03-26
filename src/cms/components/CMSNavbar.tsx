@@ -23,6 +23,11 @@ const CMSNavbar: React.FC = () => {
       path: "/cms/products",
       icon: <ShoppingBag className="h-4 w-4 mr-2" />,
     },
+    {
+      name: "Categories",
+      path: "/cms/categories",
+      icon: <FileText className="h-4 w-4 mr-2" />,
+    },
     { name: "Ads", path: "/cms/ads", icon: <Image className="h-4 w-4 mr-2" /> },
     {
       name: "Menus",

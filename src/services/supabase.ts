@@ -865,20 +865,261 @@ export const products = {
     }
   },
 
-  getCategories: async (locale: string = "en") => {
+  getCategories: async (
+    locale: string = "en",
+    options: { parentId?: string | null } = {},
+  ) => {
     try {
       if (!supabase)
         return {
           data: null,
           error: new Error("Supabase client not initialized"),
         };
-      return await supabase
+
+      let query = supabase
+        .from("categories")
+        .select("*, subcategories:categories!parent_id(*)")
+        .eq("locale", locale);
+
+      // Filter by parent_id if provided
+      if (options.parentId !== undefined) {
+        query = query.eq("parent_id", options.parentId);
+      }
+
+      return await query.order("name", { ascending: true });
+    } catch (error) {
+      console.error("Error in getCategories:", error);
+      return { data: null, error };
+    }
+  },
+
+  getCategoryTree: async (locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      // Get root categories (parent_id is null)
+      const { data: rootCategories, error } = await supabase
         .from("categories")
         .select("*")
         .eq("locale", locale)
+        .is("parent_id", null)
         .order("name", { ascending: true });
+
+      if (error) throw error;
+
+      // Function to recursively fetch child categories
+      const fetchChildCategories = async (parentId: string) => {
+        const { data: children, error } = await supabase
+          .from("categories")
+          .select("*")
+          .eq("locale", locale)
+          .eq("parent_id", parentId)
+          .order("name", { ascending: true });
+
+        if (error) throw error;
+
+        // Recursively fetch grandchildren for each child
+        const childrenWithSubcategories = await Promise.all(
+          children.map(async (child) => {
+            const subcategories = await fetchChildCategories(child.id);
+            return { ...child, subcategories };
+          }),
+        );
+
+        return childrenWithSubcategories;
+      };
+
+      // Add subcategories to each root category
+      const categoryTree = await Promise.all(
+        rootCategories.map(async (category) => {
+          const subcategories = await fetchChildCategories(category.id);
+          return { ...category, subcategories };
+        }),
+      );
+
+      return { data: categoryTree, error: null };
     } catch (error) {
-      console.error("Error in getCategories:", error);
+      console.error("Error in getCategoryTree:", error);
+      return { data: null, error };
+    }
+  },
+
+  getCategoryById: async (id: string, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      return await supabase
+        .from("categories")
+        .select("*")
+        .eq("id", id)
+        .eq("locale", locale)
+        .single();
+    } catch (error) {
+      console.error("Error in getCategoryById:", error);
+      return { data: null, error };
+    }
+  },
+
+  getCategoryBySlug: async (slug: string, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      return await supabase
+        .from("categories")
+        .select(
+          "*, parent:categories!parent_id(*), subcategories:categories!categories_parent_id_fkey(*)",
+        )
+        .eq("slug", slug)
+        .eq("locale", locale)
+        .single();
+    } catch (error) {
+      console.error("Error in getCategoryBySlug:", error);
+      return { data: null, error };
+    }
+  },
+
+  createCategory: async (categoryData: any, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const { name_en, name_ar, slug, parent_id, is_active } = categoryData;
+
+      // Calculate level based on parent
+      let level = 0;
+      if (parent_id) {
+        const { data: parent } = await supabase
+          .from("categories")
+          .select("level")
+          .eq("id", parent_id)
+          .single();
+
+        if (parent) {
+          level = parent.level + 1;
+        }
+      }
+
+      return await supabase
+        .from("categories")
+        .insert([
+          {
+            name: name_en, // Keep for backward compatibility
+            name_en,
+            name_ar,
+            slug,
+            parent_id,
+            level,
+            is_active,
+            locale,
+          },
+        ])
+        .select()
+        .single();
+    } catch (error) {
+      console.error("Error in createCategory:", error);
+      return { data: null, error };
+    }
+  },
+
+  updateCategory: async (
+    id: string,
+    categoryData: any,
+    locale: string = "en",
+  ) => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const { name_en, name_ar, slug, parent_id, is_active } = categoryData;
+
+      // Calculate level based on parent
+      let level = 0;
+      if (parent_id) {
+        const { data: parent } = await supabase
+          .from("categories")
+          .select("level")
+          .eq("id", parent_id)
+          .single();
+
+        if (parent) {
+          level = parent.level + 1;
+        }
+      }
+
+      return await supabase
+        .from("categories")
+        .update({
+          name: name_en, // Keep for backward compatibility
+          name_en,
+          name_ar,
+          slug,
+          parent_id,
+          level,
+          is_active,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .eq("locale", locale)
+        .select()
+        .single();
+    } catch (error) {
+      console.error("Error in updateCategory:", error);
+      return { data: null, error };
+    }
+  },
+
+  deleteCategory: async (id: string, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      // First check if there are any subcategories
+      const { data: subcategories } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("parent_id", id);
+
+      if (subcategories && subcategories.length > 0) {
+        return {
+          data: null,
+          error: new Error(
+            "Cannot delete category with subcategories. Delete subcategories first or reassign them.",
+          ),
+        };
+      }
+
+      // Delete category-product relationships first
+      await supabase.from("product_categories").delete().eq("category_id", id);
+
+      // Then delete the category
+      return await supabase
+        .from("categories")
+        .delete()
+        .eq("id", id)
+        .eq("locale", locale);
+    } catch (error) {
+      console.error("Error in deleteCategory:", error);
       return { data: null, error };
     }
   },

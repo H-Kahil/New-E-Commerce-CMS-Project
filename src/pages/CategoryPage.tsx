@@ -1,21 +1,37 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { products } from "../services/supabase";
 import { useRtl } from "../contexts/RtlContext";
+import { ChevronRight } from "lucide-react";
 
 // Components
 import ProductGrid from "../ecommerce/products/ProductGrid";
 
-// Placeholder component - will be expanded in future phases
+interface Category {
+  id: string;
+  name: string;
+  name_en: string;
+  name_ar: string;
+  slug: string;
+  description?: string;
+  parent_id: string | null;
+  level: number;
+  is_active: boolean;
+  parent?: Category;
+  subcategories?: Category[];
+}
+
 const CategoryPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
-  const { language } = useRtl();
+  const { language, isRtl } = useRtl();
   const [loading, setLoading] = useState(true);
-  const [category, setCategory] = useState<any>(null);
+  const [category, setCategory] = useState<Category | null>(null);
+  const [subcategories, setSubcategories] = useState<Category[]>([]);
   const [categoryProducts, setCategoryProducts] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [breadcrumbs, setBreadcrumbs] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchCategoryAndProducts = async () => {
@@ -23,16 +39,47 @@ const CategoryPage: React.FC = () => {
 
       setLoading(true);
       try {
-        // Fetch category details
+        // Fetch category details with parent and subcategories
         const { data: categoryData, error: categoryError } =
-          await products.getCategories(language);
+          await products.getCategoryBySlug(slug, language);
 
         if (categoryError) throw new Error(categoryError.message);
+        if (!categoryData) throw new Error("Category not found");
 
-        const foundCategory = categoryData?.find((cat) => cat.slug === slug);
-        if (!foundCategory) throw new Error("Category not found");
+        setCategory(categoryData);
 
-        setCategory(foundCategory);
+        // Set subcategories
+        if (categoryData.subcategories) {
+          setSubcategories(categoryData.subcategories);
+        }
+
+        // Build breadcrumb trail
+        const buildBreadcrumbs = async (cat: Category) => {
+          const trail: Category[] = [cat];
+          let currentParent = cat.parent;
+
+          while (currentParent) {
+            trail.unshift(currentParent);
+            if (currentParent.parent_id) {
+              const { data: parentData } = await products.getCategoryById(
+                currentParent.parent_id,
+                language,
+              );
+              if (parentData) {
+                currentParent = parentData;
+              } else {
+                break;
+              }
+            } else {
+              break;
+            }
+          }
+
+          return trail;
+        };
+
+        const breadcrumbTrail = await buildBreadcrumbs(categoryData);
+        setBreadcrumbs(breadcrumbTrail);
 
         // Fetch products in this category
         const { data: productsData, error: productsError } =
@@ -84,18 +131,85 @@ const CategoryPage: React.FC = () => {
     );
   }
 
+  const categoryName = isRtl
+    ? category.name_ar || category.name
+    : category.name_en || category.name;
+
   return (
     <div className="container mx-auto px-4 py-12">
+      {/* Breadcrumbs */}
+      <nav className="mb-6">
+        <ol
+          className={`flex flex-wrap items-center text-sm text-gray-500 ${isRtl ? "space-x-reverse" : ""}`}
+        >
+          <li>
+            <Link to="/" className="hover:text-primary">
+              {t("common.home", "Home")}
+            </Link>
+          </li>
+          {breadcrumbs.map((crumb, index) => (
+            <React.Fragment key={crumb.id}>
+              <li className="mx-2">
+                <ChevronRight className="h-4 w-4" />
+              </li>
+              <li>
+                {index === breadcrumbs.length - 1 ? (
+                  <span className="font-medium text-gray-900">
+                    {isRtl
+                      ? crumb.name_ar || crumb.name
+                      : crumb.name_en || crumb.name}
+                  </span>
+                ) : (
+                  <Link
+                    to={`/category/${crumb.slug}`}
+                    className="hover:text-primary"
+                  >
+                    {isRtl
+                      ? crumb.name_ar || crumb.name
+                      : crumb.name_en || crumb.name}
+                  </Link>
+                )}
+              </li>
+            </React.Fragment>
+          ))}
+        </ol>
+      </nav>
+
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{category.name}</h1>
+        <h1 className="text-3xl font-bold mb-2">{categoryName}</h1>
         {category.description && (
           <p className="text-gray-600">{category.description}</p>
         )}
       </div>
 
+      {/* Subcategories */}
+      {subcategories.length > 0 && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">
+            {t("category.subcategories", "Subcategories")}
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {subcategories.map((subcat) => (
+              <Link
+                key={subcat.id}
+                to={`/category/${subcat.slug}`}
+                className="p-4 border rounded-lg hover:bg-gray-50 transition-colors flex flex-col items-center text-center"
+              >
+                <span className="font-medium">
+                  {isRtl
+                    ? subcat.name_ar || subcat.name
+                    : subcat.name_en || subcat.name}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Products */}
       <ProductGrid
         products={categoryProducts}
-        title=""
+        title={t("category.products", "Products")}
         showFilters={true}
         showSorting={true}
         showViewToggle={true}
