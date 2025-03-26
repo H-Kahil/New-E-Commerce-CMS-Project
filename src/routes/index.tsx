@@ -17,6 +17,9 @@ import CMSDashboard from "../cms/pages/CMSDashboard";
 // CMS Pages
 import PagesModule from "../cms/pages/PagesModule";
 import ProductsModule from "../cms/pages/ProductsModule";
+import CreateProduct from "../cms/pages/CreateProduct";
+import EditProduct from "../cms/pages/EditProduct";
+import ViewProduct from "../cms/pages/ViewProduct";
 import CreatePage from "../cms/pages/CreatePage";
 import EditPage from "../cms/pages/EditPage";
 import ViewPage from "../cms/pages/ViewPage";
@@ -100,6 +103,18 @@ const router = createBrowserRouter([
       {
         path: "cms/products",
         element: <ProductsModule />,
+      },
+      {
+        path: "cms/products/create",
+        element: <CreateProduct />,
+      },
+      {
+        path: "cms/products/edit/:id",
+        element: <EditProduct />,
+      },
+      {
+        path: "cms/products/view/:id",
+        element: <ViewProduct />,
       },
       {
         path: "cms/ads",

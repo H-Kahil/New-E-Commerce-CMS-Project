@@ -16,6 +16,9 @@ import CreatePage from "./cms/pages/CreatePage";
 import EditPage from "./cms/pages/EditPage";
 import ViewPage from "./cms/pages/ViewPage";
 import ProductsModule from "./cms/pages/ProductsModule";
+import CreateProduct from "./cms/pages/CreateProduct";
+import EditProduct from "./cms/pages/EditProduct";
+import ViewProduct from "./cms/pages/ViewProduct";
 import AdsModule from "./cms/pages/AdsModule";
 import MenusModule from "./cms/pages/MenusModule";
 
@@ -43,6 +46,9 @@ function App() {
 
           {/* Products module */}
           <Route path="cms/products" element={<ProductsModule />} />
+          <Route path="cms/products/create" element={<CreateProduct />} />
+          <Route path="cms/products/edit/:id" element={<EditProduct />} />
+          <Route path="cms/products/view/:id" element={<ViewProduct />} />
 
           {/* Ads module */}
           <Route path="cms/ads" element={<AdsModule />} />
