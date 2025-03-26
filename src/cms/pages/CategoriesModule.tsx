@@ -53,6 +53,10 @@ const CategoriesModule: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialog, setDeleteDialog] = useState<{
+    open: boolean;
+    categoryId: string | null;
+  }>({ open: false, categoryId: null });
   const [expandedCategories, setExpandedCategories] = useState<
     Record<string, boolean>
   >({});
@@ -80,7 +84,7 @@ const CategoriesModule: React.FC = () => {
       const { data, error } = await products.getCategoryTree(language);
 
       if (error) throw new Error(error.message);
-      setCategories(data || []);
+      setCategories(data ? [...data] : []);
     } catch (err: any) {
       console.error("Error fetching categories:", err);
       setError(err.message || "Failed to load categories");
@@ -115,16 +119,18 @@ const CategoriesModule: React.FC = () => {
     setIsDialogOpen(true);
   };
 
-  const handleDeleteCategory = async (id: string) => {
-    if (
-      !confirm(
-        "Are you sure you want to delete this category? This will also remove it from all products.",
-      )
-    )
-      return;
+  const handleDeleteCategory = (id: string) => {
+    setDeleteDialog({ open: true, categoryId: id });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteDialog.categoryId) return;
 
     try {
-      const { error } = await products.deleteCategory(id, language);
+      const { error } = await products.deleteCategory(
+        deleteDialog.categoryId,
+        language,
+      );
       if (error) throw new Error(error.message);
 
       // Refresh the category list
@@ -133,6 +139,8 @@ const CategoriesModule: React.FC = () => {
     } catch (err: any) {
       console.error("Error deleting category:", err);
       alert(`Failed to delete category: ${err.message}`);
+    } finally {
+      setDeleteDialog({ open: false, categoryId: null });
     }
   };
 
@@ -181,10 +189,13 @@ const CategoriesModule: React.FC = () => {
   };
 
   const handleSlugGeneration = () => {
-    // Generate slug from English name
+    // Generate slug from English name with improved handling
     const slug = formData.name_en
+      .trim()
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/\s+/g, "-")
+      .replace(/[^\w-]+/g, "")
+      .replace(/--+/g, "-")
       .replace(/^-+|-+$/g, "");
 
     setFormData((prev) => ({ ...prev, slug }));
@@ -197,9 +208,9 @@ const CategoriesModule: React.FC = () => {
     }));
   };
 
-  // Recursive function to render category tree
+  // Recursive function to render category tree - optimized with flatMap
   const renderCategoryTree = (categoryList: Category[], depth = 0) => {
-    return categoryList.map((category) => {
+    return categoryList.flatMap((category) => {
       const hasSubcategories =
         category.subcategories && category.subcategories.length > 0;
       const isExpanded = expandedCategories[category.id];
@@ -207,11 +218,7 @@ const CategoriesModule: React.FC = () => {
         ? "text-gray-400 hover:bg-gray-50"
         : "hover:bg-gray-50";
 
-      // Create an array of elements instead of using React.Fragment with className
-      const elements = [];
-
-      // Add the main row
-      elements.push(
+      return [
         <tr key={`row-${category.id}`} className={rowClassName}>
           <td className="px-4 py-3 border-b">
             <div
@@ -266,24 +273,10 @@ const CategoriesModule: React.FC = () => {
             </div>
           </td>
         </tr>,
-      );
-
-      // Add subcategories if expanded
-      if (hasSubcategories && isExpanded) {
-        const subcategoryElements = renderCategoryTree(
-          category.subcategories!,
-          depth + 1,
-        );
-        subcategoryElements.forEach((element, index) => {
-          elements.push(
-            React.cloneElement(element, {
-              key: `subcat-${category.id}-${index}`,
-            }),
-          );
-        });
-      }
-
-      return <React.Fragment key={category.id}>{elements}</React.Fragment>;
+        ...(hasSubcategories && isExpanded
+          ? renderCategoryTree(category.subcategories!, depth + 1)
+          : []),
+      ];
     });
   };
 
@@ -526,6 +519,40 @@ const CategoriesModule: React.FC = () => {
                 </Button>
               </DialogFooter>
             </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog
+          open={deleteDialog.open}
+          onOpenChange={(open) => setDeleteDialog({ ...deleteDialog, open })}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Category</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this category? This will also
+                remove it from all products. This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setDeleteDialog({ open: false, categoryId: null })
+                }
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteConfirm}
+                className="bg-red-500 hover:bg-red-600"
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
