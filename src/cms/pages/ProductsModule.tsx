@@ -85,7 +85,7 @@ const ProductsModule: React.FC = () => {
           <h2 className="text-xl font-semibold">
             {t("cms.products.title", "Products")}
           </h2>
-          <Button onClick={() => navigate("/cms/products/create")}>
+          <Button onClick={() => navigate("/cms/products/wizard")}>
             <Plus className="mr-2 h-4 w-4" />
             {t("cms.products.createNew", "Create New Product")}
           </Button>
@@ -96,7 +96,7 @@ const ProductsModule: React.FC = () => {
             <p className="text-gray-500 mb-4">
               {t("cms.products.noProducts", "No products found")}
             </p>
-            <Button onClick={() => navigate("/cms/products/create")}>
+            <Button onClick={() => navigate("/cms/products/wizard")}>
               <Plus className="mr-2 h-4 w-4" />
               {t("cms.products.createFirst", "Create your first product")}
             </Button>

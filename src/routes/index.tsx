@@ -27,6 +27,7 @@ import ViewProduct from "../cms/pages/ViewProduct";
 import CreatePage from "../cms/pages/CreatePage";
 import EditPage from "../cms/pages/EditPage";
 import ViewPage from "../cms/pages/ViewPage";
+import ProductWizard from "../cms/pages/ProductWizard";
 
 const router = createBrowserRouter([
   {
@@ -89,6 +90,10 @@ const router = createBrowserRouter([
       {
         path: "cms/products/create",
         element: <CreateProduct />,
+      },
+      {
+        path: "cms/products/wizard",
+        element: <ProductWizard />,
       },
       {
         path: "cms/products/edit/:id",
