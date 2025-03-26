@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Wizard } from "@/components/ui/wizard";
 import CMSNavbar from "../components/CMSNavbar";
 
 const EditProduct: React.FC = () => {
@@ -269,6 +269,577 @@ const EditProduct: React.FC = () => {
     );
   }
 
+  // Define wizard steps
+  const wizardSteps = [
+    {
+      title: t("cms.products.basicInfo", "Basic Info"),
+      description: t(
+        "cms.products.basicInfoDesc",
+        "Enter the essential product information",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="space-y-4">
+            <div>
+              <Label
+                htmlFor="productTitle"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.productTitle", "Product Title")}
+              </Label>
+              <Input
+                type="text"
+                id="productTitle"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="productSlug"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.productSlug", "Product Slug")}
+                <span className="text-xs text-gray-500 ml-1">
+                  (
+                  {t(
+                    "cms.products.slugInfo",
+                    "Leave empty to generate from title",
+                  )}
+                  )
+                </span>
+              </Label>
+              <Input
+                type="text"
+                id="productSlug"
+                value={slug}
+                onChange={(e) => setSlug(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="productDescription"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.description", "Product Description")}
+              </Label>
+              <Textarea
+                id="productDescription"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full h-32"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label
+                  htmlFor="productPrice"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.price", "Price")}
+                </Label>
+                <Input
+                  type="number"
+                  id="productPrice"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productSalePrice"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.salePrice", "Sale Price")}
+                </Label>
+                <Input
+                  type="number"
+                  id="productSalePrice"
+                  value={salePrice}
+                  onChange={(e) => setSalePrice(e.target.value)}
+                  className="w-full"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productComparePrice"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.compareAtPrice", "Compare At Price")}
+                </Label>
+                <Input
+                  type="number"
+                  id="productComparePrice"
+                  value={compareAtPrice}
+                  onChange={(e) => setCompareAtPrice(e.target.value)}
+                  className="w-full"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label
+                  htmlFor="productSku"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.sku", "SKU")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productSku"
+                  value={sku}
+                  onChange={(e) => setSku(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productStock"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.stock", "Stock")}
+                </Label>
+                <Input
+                  type="number"
+                  id="productStock"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  className="w-full"
+                  min="0"
+                  step="1"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productAvailability"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.availability", "Availability")}
+                </Label>
+                <select
+                  id="productAvailability"
+                  value={availabilityStatus}
+                  onChange={(e) => setAvailabilityStatus(e.target.value)}
+                  className="w-full rounded-md border border-gray-300 px-3 py-2"
+                >
+                  <option value="in_stock">
+                    {t("cms.products.inStock", "In Stock")}
+                  </option>
+                  <option value="out_of_stock">
+                    {t("cms.products.outOfStock", "Out of Stock")}
+                  </option>
+                  <option value="backorder">
+                    {t("cms.products.backorder", "Backorder")}
+                  </option>
+                  <option value="preorder">
+                    {t("cms.products.preorder", "Pre-order")}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+              <div className="flex items-center space-x-2">
+                <Switch id="isNew" checked={isNew} onCheckedChange={setIsNew} />
+                <Label htmlFor="isNew">
+                  {t("cms.products.isNew", "Mark as New")}
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isOnSale"
+                  checked={isOnSale}
+                  onCheckedChange={setIsOnSale}
+                />
+                <Label htmlFor="isOnSale">
+                  {t("cms.products.isOnSale", "On Sale")}
+                </Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="isFeatured"
+                  checked={isFeatured}
+                  onCheckedChange={setIsFeatured}
+                />
+                <Label htmlFor="isFeatured">
+                  {t("cms.products.isFeatured", "Featured Product")}
+                </Label>
+              </div>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t("cms.products.details", "Details"),
+      description: t(
+        "cms.products.detailsDesc",
+        "Add detailed product specifications",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label
+                  htmlFor="productBrand"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.brand", "Brand")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productBrand"
+                  value={brand}
+                  onChange={(e) => setBrand(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productModel"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.model", "Model")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productModel"
+                  value={model}
+                  onChange={(e) => setModel(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label
+                  htmlFor="productColor"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.color", "Color")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productColor"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productDimensions"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.dimensions", "Dimensions")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productDimensions"
+                  value={dimensions}
+                  onChange={(e) => setDimensions(e.target.value)}
+                  className="w-full"
+                  placeholder="e.g. 10 x 5 x 2 inches"
+                />
+              </div>
+              <div>
+                <Label
+                  htmlFor="productWeight"
+                  className="block text-sm font-medium text-gray-700 mb-1"
+                >
+                  {t("cms.products.weight", "Weight")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productWeight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                  className="w-full"
+                  placeholder="e.g. 2.5 lbs"
+                />
+              </div>
+            </div>
+            <div>
+              <Label
+                htmlFor="productWarranty"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.warranty", "Warranty Information")}
+              </Label>
+              <Input
+                type="text"
+                id="productWarranty"
+                value={warranty}
+                onChange={(e) => setWarranty(e.target.value)}
+                className="w-full"
+                placeholder="e.g. 1 Year Limited Warranty"
+              />
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t("cms.products.featuresSpecs", "Features & Specs"),
+      description: t(
+        "cms.products.featuresSpecsDesc",
+        "Add product features and technical specifications",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="mb-6">
+            <h3 className="text-lg font-medium mb-4">
+              {t("cms.products.keyFeatures", "Key Features")}
+            </h3>
+            <div className="space-y-3">
+              {features.map((feature, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={feature}
+                    onChange={(e) => updateFeature(index, e.target.value)}
+                    placeholder={t(
+                      "cms.products.featurePlaceholder",
+                      "Enter a product feature",
+                    )}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeFeature(index)}
+                    disabled={features.length <= 1}
+                  >
+                    ✕
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3"
+              onClick={addFeature}
+            >
+              {t("cms.products.addFeature", "Add Feature")}
+            </Button>
+          </div>
+
+          <div>
+            <h3 className="text-lg font-medium mb-4">
+              {t("cms.products.specifications", "Specifications")}
+            </h3>
+            <div className="space-y-3">
+              {specifications.map((spec, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={spec.key}
+                    onChange={(e) =>
+                      updateSpecification(index, "key", e.target.value)
+                    }
+                    placeholder={t(
+                      "cms.products.specNamePlaceholder",
+                      "Specification name",
+                    )}
+                    className="flex-1"
+                  />
+                  <Input
+                    type="text"
+                    value={spec.value}
+                    onChange={(e) =>
+                      updateSpecification(index, "value", e.target.value)
+                    }
+                    placeholder={t(
+                      "cms.products.specValuePlaceholder",
+                      "Specification value",
+                    )}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeSpecification(index)}
+                    disabled={specifications.length <= 1}
+                  >
+                    ✕
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              className="mt-3"
+              onClick={addSpecification}
+            >
+              {t("cms.products.addSpecification", "Add Specification")}
+            </Button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t("cms.products.media", "Media"),
+      description: t(
+        "cms.products.mediaDesc",
+        "Upload product images and videos",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {t("cms.products.images", "Product Images")}
+          </h2>
+          <div className="text-center py-8 bg-gray-50 rounded-md">
+            <p className="text-gray-500">
+              {t("cms.products.noImages", "No images added yet")}
+            </p>
+            <Button className="mt-4">
+              {t("cms.products.addImage", "Add Image")}
+            </Button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t("cms.products.categories", "Categories"),
+      description: t(
+        "cms.products.categoriesDesc",
+        "Assign product to categories",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {t("cms.products.categories", "Categories")}
+          </h2>
+          <div className="text-center py-8 bg-gray-50 rounded-md">
+            <p className="text-gray-500">
+              {t("cms.products.noCategories", "No categories selected")}
+            </p>
+            <Button className="mt-4">
+              {t("cms.products.selectCategories", "Select Categories")}
+            </Button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t("cms.products.variants", "Variants"),
+      description: t(
+        "cms.products.variantsDesc",
+        "Create product variants like size, color",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h2 className="text-lg font-semibold mb-4">
+            {t("cms.products.variants", "Product Variants")}
+          </h2>
+          <div className="text-center py-8 bg-gray-50 rounded-md">
+            <p className="text-gray-500">
+              {t("cms.products.noVariants", "No variants added yet")}
+            </p>
+            <Button className="mt-4">
+              {t("cms.products.addVariant", "Add Variant")}
+            </Button>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t("cms.products.seo", "SEO"),
+      description: t(
+        "cms.products.seoDesc",
+        "Optimize product for search engines",
+      ),
+      content: (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <div className="space-y-4">
+            <div>
+              <Label
+                htmlFor="metaTitle"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.metaTitle", "Meta Title")}
+                <span className="text-xs text-gray-500 ml-1">
+                  (
+                  {t(
+                    "cms.products.metaTitleInfo",
+                    "Leave empty to use product title",
+                  )}
+                  )
+                </span>
+              </Label>
+              <Input
+                type="text"
+                id="metaTitle"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                className="w-full"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="metaDescription"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.metaDescription", "Meta Description")}
+                <span className="text-xs text-gray-500 ml-1">
+                  (
+                  {t(
+                    "cms.products.metaDescriptionInfo",
+                    "Leave empty to use product description",
+                  )}
+                  )
+                </span>
+              </Label>
+              <Textarea
+                id="metaDescription"
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                className="w-full h-24"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="metaKeywords"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                {t("cms.products.metaKeywords", "Meta Keywords")}
+                <span className="text-xs text-gray-500 ml-1">
+                  (
+                  {t(
+                    "cms.products.metaKeywordsInfo",
+                    "Comma-separated keywords",
+                  )}
+                  )
+                </span>
+              </Label>
+              <Input
+                type="text"
+                id="metaKeywords"
+                value={metaKeywords}
+                onChange={(e) => setMetaKeywords(e.target.value)}
+                className="w-full"
+                placeholder="keyword1, keyword2, keyword3"
+              />
+            </div>
+          </div>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <CMSNavbar />
@@ -289,567 +860,13 @@ const EditProduct: React.FC = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="mb-4">
-            <TabsTrigger value="basic">
-              {t("cms.products.basicInfo", "Basic Info")}
-            </TabsTrigger>
-            <TabsTrigger value="details">
-              {t("cms.products.details", "Details")}
-            </TabsTrigger>
-            <TabsTrigger value="features">
-              {t("cms.products.featuresSpecs", "Features & Specs")}
-            </TabsTrigger>
-            <TabsTrigger value="media">
-              {t("cms.products.media", "Media")}
-            </TabsTrigger>
-            <TabsTrigger value="categories">
-              {t("cms.products.categories", "Categories")}
-            </TabsTrigger>
-            <TabsTrigger value="variants">
-              {t("cms.products.variants", "Variants")}
-            </TabsTrigger>
-            <TabsTrigger value="seo">
-              {t("cms.products.seo", "SEO")}
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Basic Info Tab */}
-          <TabsContent value="basic" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="space-y-4">
-                <div>
-                  <Label
-                    htmlFor="productTitle"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.productTitle", "Product Title")}
-                  </Label>
-                  <Input
-                    type="text"
-                    id="productTitle"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="productSlug"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.productSlug", "Product Slug")}
-                    <span className="text-xs text-gray-500 ml-1">
-                      (
-                      {t(
-                        "cms.products.slugInfo",
-                        "Leave empty to generate from title",
-                      )}
-                      )
-                    </span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="productSlug"
-                    value={slug}
-                    onChange={(e) => setSlug(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="productDescription"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.description", "Product Description")}
-                  </Label>
-                  <Textarea
-                    id="productDescription"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full h-32"
-                  />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label
-                      htmlFor="productPrice"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.price", "Price")}
-                    </Label>
-                    <Input
-                      type="number"
-                      id="productPrice"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      className="w-full"
-                      step="0.01"
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productSalePrice"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.salePrice", "Sale Price")}
-                    </Label>
-                    <Input
-                      type="number"
-                      id="productSalePrice"
-                      value={salePrice}
-                      onChange={(e) => setSalePrice(e.target.value)}
-                      className="w-full"
-                      step="0.01"
-                      min="0"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productComparePrice"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.compareAtPrice", "Compare At Price")}
-                    </Label>
-                    <Input
-                      type="number"
-                      id="productComparePrice"
-                      value={compareAtPrice}
-                      onChange={(e) => setCompareAtPrice(e.target.value)}
-                      className="w-full"
-                      step="0.01"
-                      min="0"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label
-                      htmlFor="productSku"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.sku", "SKU")}
-                    </Label>
-                    <Input
-                      type="text"
-                      id="productSku"
-                      value={sku}
-                      onChange={(e) => setSku(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productStock"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.stock", "Stock")}
-                    </Label>
-                    <Input
-                      type="number"
-                      id="productStock"
-                      value={stock}
-                      onChange={(e) => setStock(e.target.value)}
-                      className="w-full"
-                      min="0"
-                      step="1"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productAvailability"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.availability", "Availability")}
-                    </Label>
-                    <select
-                      id="productAvailability"
-                      value={availabilityStatus}
-                      onChange={(e) => setAvailabilityStatus(e.target.value)}
-                      className="w-full rounded-md border border-gray-300 px-3 py-2"
-                    >
-                      <option value="in_stock">
-                        {t("cms.products.inStock", "In Stock")}
-                      </option>
-                      <option value="out_of_stock">
-                        {t("cms.products.outOfStock", "Out of Stock")}
-                      </option>
-                      <option value="backorder">
-                        {t("cms.products.backorder", "Backorder")}
-                      </option>
-                      <option value="preorder">
-                        {t("cms.products.preorder", "Pre-order")}
-                      </option>
-                    </select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="isNew"
-                      checked={isNew}
-                      onCheckedChange={setIsNew}
-                    />
-                    <Label htmlFor="isNew">
-                      {t("cms.products.isNew", "Mark as New")}
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="isOnSale"
-                      checked={isOnSale}
-                      onCheckedChange={setIsOnSale}
-                    />
-                    <Label htmlFor="isOnSale">
-                      {t("cms.products.isOnSale", "On Sale")}
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="isFeatured"
-                      checked={isFeatured}
-                      onCheckedChange={setIsFeatured}
-                    />
-                    <Label htmlFor="isFeatured">
-                      {t("cms.products.isFeatured", "Featured Product")}
-                    </Label>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Details Tab */}
-          <TabsContent value="details" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label
-                      htmlFor="productBrand"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.brand", "Brand")}
-                    </Label>
-                    <Input
-                      type="text"
-                      id="productBrand"
-                      value={brand}
-                      onChange={(e) => setBrand(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productModel"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.model", "Model")}
-                    </Label>
-                    <Input
-                      type="text"
-                      id="productModel"
-                      value={model}
-                      onChange={(e) => setModel(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label
-                      htmlFor="productColor"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.color", "Color")}
-                    </Label>
-                    <Input
-                      type="text"
-                      id="productColor"
-                      value={color}
-                      onChange={(e) => setColor(e.target.value)}
-                      className="w-full"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productDimensions"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.dimensions", "Dimensions")}
-                    </Label>
-                    <Input
-                      type="text"
-                      id="productDimensions"
-                      value={dimensions}
-                      onChange={(e) => setDimensions(e.target.value)}
-                      className="w-full"
-                      placeholder="e.g. 10 x 5 x 2 inches"
-                    />
-                  </div>
-                  <div>
-                    <Label
-                      htmlFor="productWeight"
-                      className="block text-sm font-medium text-gray-700 mb-1"
-                    >
-                      {t("cms.products.weight", "Weight")}
-                    </Label>
-                    <Input
-                      type="text"
-                      id="productWeight"
-                      value={weight}
-                      onChange={(e) => setWeight(e.target.value)}
-                      className="w-full"
-                      placeholder="e.g. 2.5 lbs"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <Label
-                    htmlFor="productWarranty"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.warranty", "Warranty Information")}
-                  </Label>
-                  <Input
-                    type="text"
-                    id="productWarranty"
-                    value={warranty}
-                    onChange={(e) => setWarranty(e.target.value)}
-                    className="w-full"
-                    placeholder="e.g. 1 Year Limited Warranty"
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Features & Specs Tab */}
-          <TabsContent value="features" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="mb-6">
-                <h3 className="text-lg font-medium mb-4">
-                  {t("cms.products.keyFeatures", "Key Features")}
-                </h3>
-                <div className="space-y-3">
-                  {features.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        type="text"
-                        value={feature}
-                        onChange={(e) => updateFeature(index, e.target.value)}
-                        placeholder={t(
-                          "cms.products.featurePlaceholder",
-                          "Enter a product feature",
-                        )}
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeFeature(index)}
-                        disabled={features.length <= 1}
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="mt-3"
-                  onClick={addFeature}
-                >
-                  {t("cms.products.addFeature", "Add Feature")}
-                </Button>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-medium mb-4">
-                  {t("cms.products.specifications", "Specifications")}
-                </h3>
-                <div className="space-y-3">
-                  {specifications.map((spec, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <Input
-                        type="text"
-                        value={spec.key}
-                        onChange={(e) =>
-                          updateSpecification(index, "key", e.target.value)
-                        }
-                        placeholder={t(
-                          "cms.products.specNamePlaceholder",
-                          "Specification name",
-                        )}
-                        className="flex-1"
-                      />
-                      <Input
-                        type="text"
-                        value={spec.value}
-                        onChange={(e) =>
-                          updateSpecification(index, "value", e.target.value)
-                        }
-                        placeholder={t(
-                          "cms.products.specValuePlaceholder",
-                          "Specification value",
-                        )}
-                        className="flex-1"
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeSpecification(index)}
-                        disabled={specifications.length <= 1}
-                      >
-                        ✕
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="mt-3"
-                  onClick={addSpecification}
-                >
-                  {t("cms.products.addSpecification", "Add Specification")}
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Media Tab */}
-          <TabsContent value="media" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">
-                {t("cms.products.images", "Product Images")}
-              </h2>
-              <div className="text-center py-8 bg-gray-50 rounded-md">
-                <p className="text-gray-500">
-                  {t("cms.products.noImages", "No images added yet")}
-                </p>
-                <Button className="mt-4">
-                  {t("cms.products.addImage", "Add Image")}
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Categories Tab */}
-          <TabsContent value="categories" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">
-                {t("cms.products.categories", "Categories")}
-              </h2>
-              <div className="text-center py-8 bg-gray-50 rounded-md">
-                <p className="text-gray-500">
-                  {t("cms.products.noCategories", "No categories selected")}
-                </p>
-                <Button className="mt-4">
-                  {t("cms.products.selectCategories", "Select Categories")}
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Variants Tab */}
-          <TabsContent value="variants" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-lg font-semibold mb-4">
-                {t("cms.products.variants", "Product Variants")}
-              </h2>
-              <div className="text-center py-8 bg-gray-50 rounded-md">
-                <p className="text-gray-500">
-                  {t("cms.products.noVariants", "No variants added yet")}
-                </p>
-                <Button className="mt-4">
-                  {t("cms.products.addVariant", "Add Variant")}
-                </Button>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* SEO Tab */}
-          <TabsContent value="seo" className="space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="space-y-4">
-                <div>
-                  <Label
-                    htmlFor="metaTitle"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.metaTitle", "Meta Title")}
-                    <span className="text-xs text-gray-500 ml-1">
-                      (
-                      {t(
-                        "cms.products.metaTitleInfo",
-                        "Leave empty to use product title",
-                      )}
-                      )
-                    </span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="metaTitle"
-                    value={metaTitle}
-                    onChange={(e) => setMetaTitle(e.target.value)}
-                    className="w-full"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="metaDescription"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.metaDescription", "Meta Description")}
-                    <span className="text-xs text-gray-500 ml-1">
-                      (
-                      {t(
-                        "cms.products.metaDescriptionInfo",
-                        "Leave empty to use product description",
-                      )}
-                      )
-                    </span>
-                  </Label>
-                  <Textarea
-                    id="metaDescription"
-                    value={metaDescription}
-                    onChange={(e) => setMetaDescription(e.target.value)}
-                    className="w-full h-24"
-                  />
-                </div>
-                <div>
-                  <Label
-                    htmlFor="metaKeywords"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    {t("cms.products.metaKeywords", "Meta Keywords")}
-                    <span className="text-xs text-gray-500 ml-1">
-                      (
-                      {t(
-                        "cms.products.metaKeywordsInfo",
-                        "Comma-separated keywords",
-                      )}
-                      )
-                    </span>
-                  </Label>
-                  <Input
-                    type="text"
-                    id="metaKeywords"
-                    value={metaKeywords}
-                    onChange={(e) => setMetaKeywords(e.target.value)}
-                    className="w-full"
-                    placeholder="keyword1, keyword2, keyword3"
-                  />
-                </div>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+        <Wizard
+          steps={wizardSteps}
+          onComplete={handleSave}
+          completeButtonText={t("common.save", "Save")}
+          nextButtonText={t("common.next", "Next")}
+          previousButtonText={t("common.back", "Back")}
+        />
       </div>
     </div>
   );
