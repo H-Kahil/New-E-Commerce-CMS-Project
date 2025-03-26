@@ -37,19 +37,21 @@ const CreateProduct: React.FC = () => {
           .replace(/\s+/g, "-")
           .replace(/[^a-z0-9-]/g, "");
 
-      // This is a placeholder for the actual product creation API call
-      // In a real implementation, you would call the products.createProduct method
-      // const { data, error } = await products.createProduct({
-      //   title,
-      //   slug: finalSlug,
-      //   description,
-      //   price: parseFloat(price),
-      //   sku,
-      //   stock: parseInt(stock, 10),
-      // }, language);
-
-      // For now, we'll just simulate a successful creation
-      const error = null;
+      // Call the actual product creation API
+      const { data, error } = await products.createProduct(
+        {
+          title,
+          slug: finalSlug,
+          description,
+          price: parseFloat(price),
+          sku,
+          stock: parseInt(stock, 10),
+          // Add empty arrays for categories and images
+          categories: [],
+          images: [],
+        },
+        language,
+      );
 
       if (error) {
         console.error("Error creating product:", error);

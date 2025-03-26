@@ -22,34 +22,7 @@ const ViewProduct: React.FC = () => {
 
       setLoading(true);
       try {
-        // In a real implementation, you would call the products.getProduct method
-        // const { data, error } = await products.getProduct(id, language);
-
-        // For now, we'll just simulate a successful fetch with mock data
-        const mockProduct = {
-          id,
-          title: "Sample Product",
-          slug: "sample-product",
-          description:
-            "This is a sample product description. It provides details about the product features, specifications, and benefits. This text would typically be much longer and more detailed in a real product.",
-          price: 99.99,
-          sku: "PROD-001",
-          stock: 100,
-          images: [
-            {
-              id: "img1",
-              url: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&q=80",
-              alt: "Product image",
-            },
-          ],
-          categories: [{ id: "cat1", name: "Electronics" }],
-          variants: [],
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        };
-
-        const data = mockProduct;
-        const error = null;
+        const { data, error } = await products.getProduct(id, language);
 
         if (error) {
           console.error("Error fetching product:", error);
@@ -123,15 +96,15 @@ const ViewProduct: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              {product.images && product.images.length > 0 ? (
+              {product.product_images && product.product_images.length > 0 ? (
                 <div>
                   <img
-                    src={product.images[0].url}
-                    alt={product.images[0].alt || product.title}
+                    src={product.product_images[0].url}
+                    alt={product.product_images[0].alt || product.title}
                     className="w-full h-auto rounded-lg mb-4"
                   />
                   <div className="flex gap-2 overflow-x-auto">
-                    {product.images.map((image: any) => (
+                    {product.product_images.map((image: any) => (
                       <img
                         key={image.id}
                         src={image.url}
@@ -173,23 +146,26 @@ const ViewProduct: React.FC = () => {
                 </span>
               </div>
 
-              {product.categories && product.categories.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-sm text-gray-700 mb-1">
-                    {t("cms.products.categories", "Categories")}:
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {product.categories.map((category: any) => (
-                      <span
-                        key={category.id}
-                        className="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm"
-                      >
-                        {category.name}
-                      </span>
-                    ))}
+              {product.product_categories &&
+                product.product_categories.length > 0 && (
+                  <div className="mb-4">
+                    <p className="text-sm text-gray-700 mb-1">
+                      {t("cms.products.categories", "Categories")}:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {product.product_categories.map(
+                        (pc: any, index: number) => (
+                          <span
+                            key={index}
+                            className="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm"
+                          >
+                            {pc.category_id}
+                          </span>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
 
               <div className="mt-6">
                 <h3 className="text-lg font-semibold mb-2">

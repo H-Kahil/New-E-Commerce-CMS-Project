@@ -31,25 +31,7 @@ const EditProduct: React.FC = () => {
 
       setLoading(true);
       try {
-        // In a real implementation, you would call the products.getProduct method
-        // const { data, error } = await products.getProduct(id, language);
-
-        // For now, we'll just simulate a successful fetch with mock data
-        const mockProduct = {
-          id,
-          title: "Sample Product",
-          slug: "sample-product",
-          description: "This is a sample product description.",
-          price: 99.99,
-          sku: "PROD-001",
-          stock: 100,
-          images: [],
-          categories: [],
-          variants: [],
-        };
-
-        const data = mockProduct;
-        const error = null;
+        const { data, error } = await products.getProduct(id, language);
 
         if (error) {
           console.error("Error fetching product:", error);
@@ -91,19 +73,22 @@ const EditProduct: React.FC = () => {
           .replace(/\s+/g, "-")
           .replace(/[^a-z0-9-]/g, "");
 
-      // This is a placeholder for the actual product update API call
-      // In a real implementation, you would call the products.updateProduct method
-      // const { data, error } = await products.updateProduct(id, {
-      //   title,
-      //   slug: finalSlug,
-      //   description,
-      //   price: parseFloat(price),
-      //   sku,
-      //   stock: parseInt(stock, 10),
-      // }, language);
-
-      // For now, we'll just simulate a successful update
-      const error = null;
+      // Call the actual product update API
+      const { data, error } = await products.updateProduct(
+        id || "",
+        {
+          title,
+          slug: finalSlug,
+          description,
+          price: parseFloat(price),
+          sku,
+          stock: parseInt(stock, 10),
+          // Keep existing categories and images
+          categories: product?.categories?.map((cat: any) => cat.id) || [],
+          images: product?.product_images || [],
+        },
+        language,
+      );
 
       if (error) {
         console.error("Error updating product:", error);

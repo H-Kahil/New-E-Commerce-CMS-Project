@@ -19,62 +19,11 @@ const ProductsModule: React.FC = () => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        // In a real implementation, you would call the products.getProducts method
-        // const { data, error } = await products.getProducts(language);
+        const { data, error } = await products.getProducts({
+          locale: language,
+        });
 
-        // For now, we'll just simulate a successful fetch with mock data
-        const mockProducts = [
-          {
-            id: "1",
-            title: "Smartphone X",
-            slug: "smartphone-x",
-            price: 799.99,
-            sku: "PHONE-001",
-            stock: 45,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            id: "2",
-            title: "Laptop Pro",
-            slug: "laptop-pro",
-            price: 1299.99,
-            sku: "LAPTOP-001",
-            stock: 20,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            id: "3",
-            title: "Wireless Headphones",
-            slug: "wireless-headphones",
-            price: 149.99,
-            sku: "AUDIO-001",
-            stock: 78,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            id: "4",
-            title: "Smart Watch",
-            slug: "smart-watch",
-            price: 249.99,
-            sku: "WATCH-001",
-            stock: 32,
-            updated_at: new Date().toISOString(),
-          },
-          {
-            id: "5",
-            title: "Bluetooth Speaker",
-            slug: "bluetooth-speaker",
-            price: 89.99,
-            sku: "AUDIO-002",
-            stock: 54,
-            updated_at: new Date().toISOString(),
-          },
-        ];
-
-        const data = mockProducts;
-        const fetchError = null;
-
-        if (fetchError) throw new Error(fetchError.message);
+        if (error) throw new Error(error.message);
         setProductsList(data || []);
       } catch (err: any) {
         console.error("Error fetching products:", err);
@@ -91,9 +40,7 @@ const ProductsModule: React.FC = () => {
     if (!confirm("Are you sure you want to delete this product?")) return;
 
     try {
-      // This function might not be implemented yet, so we'll just simulate success for now
-      // const { error } = await products.deleteProduct(id, language);
-      const error = null;
+      const { error } = await products.deleteProduct(id, language);
       if (error) throw new Error(error.message);
 
       // Remove the deleted product from the state

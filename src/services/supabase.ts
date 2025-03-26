@@ -576,14 +576,14 @@ export const products = {
         category,
         collection,
         featured,
-        limit = 10,
+        limit = 50,
         offset = 0,
         locale = "en",
       } = options;
 
       let query = supabase
         .from("products")
-        .select("*, product_categories!inner(*), product_images(*)")
+        .select("*, product_categories(*), product_images(*)")
         .eq("locale", locale);
 
       if (category) {
@@ -646,6 +646,219 @@ export const products = {
       return { data, error };
     } catch (error) {
       console.error("Error in getProduct:", error);
+      return { data: null, error };
+    }
+  },
+
+  createProduct: async (productData: any, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const {
+        title,
+        slug,
+        description,
+        price,
+        sku,
+        stock,
+        categories = [],
+        images = [],
+      } = productData;
+
+      // Insert the product
+      const { data: product, error: productError } = await supabase
+        .from("products")
+        .insert([
+          {
+            title,
+            slug,
+            description,
+            price,
+            sku,
+            stock,
+            locale,
+          },
+        ])
+        .select()
+        .single();
+
+      if (productError) {
+        console.error("Error creating product:", productError);
+        return { data: null, error: productError };
+      }
+
+      // Insert categories if any
+      if (categories.length > 0 && product) {
+        const productCategories = categories.map((categoryId: string) => ({
+          product_id: product.id,
+          category_id: categoryId,
+          locale,
+        }));
+
+        const { error: categoriesError } = await supabase
+          .from("product_categories")
+          .insert(productCategories);
+
+        if (categoriesError) {
+          console.error("Error linking categories:", categoriesError);
+        }
+      }
+
+      // Insert images if any
+      if (images.length > 0 && product) {
+        const productImages = images.map((image: any, index: number) => ({
+          product_id: product.id,
+          url: image.url,
+          alt: image.alt || product.title,
+          is_primary: index === 0,
+          sort_order: index,
+          locale,
+        }));
+
+        const { error: imagesError } = await supabase
+          .from("product_images")
+          .insert(productImages);
+
+        if (imagesError) {
+          console.error("Error adding images:", imagesError);
+        }
+      }
+
+      return { data: product, error: null };
+    } catch (error) {
+      console.error("Error in createProduct:", error);
+      return { data: null, error };
+    }
+  },
+
+  updateProduct: async (
+    id: string,
+    productData: any,
+    locale: string = "en",
+  ) => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const {
+        title,
+        slug,
+        description,
+        price,
+        sku,
+        stock,
+        categories,
+        images,
+      } = productData;
+
+      // Update the product
+      const { data: updatedProduct, error: updateError } = await supabase
+        .from("products")
+        .update({
+          title,
+          slug,
+          description,
+          price,
+          sku,
+          stock,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id)
+        .eq("locale", locale)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Error updating product:", updateError);
+        return { data: null, error: updateError };
+      }
+
+      // Update categories if provided
+      if (categories && updatedProduct) {
+        // First delete existing category links
+        await supabase.from("product_categories").delete().eq("product_id", id);
+
+        // Then insert new ones
+        if (categories.length > 0) {
+          const productCategories = categories.map((categoryId: string) => ({
+            product_id: id,
+            category_id: categoryId,
+            locale,
+          }));
+
+          const { error: categoriesError } = await supabase
+            .from("product_categories")
+            .insert(productCategories);
+
+          if (categoriesError) {
+            console.error("Error updating categories:", categoriesError);
+          }
+        }
+      }
+
+      // Update images if provided
+      if (images && updatedProduct) {
+        // First delete existing images
+        await supabase.from("product_images").delete().eq("product_id", id);
+
+        // Then insert new ones
+        if (images.length > 0) {
+          const productImages = images.map((image: any, index: number) => ({
+            product_id: id,
+            url: image.url,
+            alt: image.alt || updatedProduct.title,
+            is_primary: index === 0,
+            sort_order: index,
+            locale,
+          }));
+
+          const { error: imagesError } = await supabase
+            .from("product_images")
+            .insert(productImages);
+
+          if (imagesError) {
+            console.error("Error updating images:", imagesError);
+          }
+        }
+      }
+
+      return { data: updatedProduct, error: null };
+    } catch (error) {
+      console.error("Error in updateProduct:", error);
+      return { data: null, error };
+    }
+  },
+
+  deleteProduct: async (id: string, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      // Delete related records first
+      await supabase.from("product_categories").delete().eq("product_id", id);
+      await supabase.from("product_images").delete().eq("product_id", id);
+      await supabase.from("product_variants").delete().eq("product_id", id);
+
+      // Delete the product
+      const { data, error } = await supabase
+        .from("products")
+        .delete()
+        .eq("id", id)
+        .eq("locale", locale);
+
+      return { data, error };
+    } catch (error) {
+      console.error("Error in deleteProduct:", error);
       return { data: null, error };
     }
   },
