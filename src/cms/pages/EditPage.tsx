@@ -89,10 +89,8 @@ const EditPage: React.FC = () => {
       }
 
       alert("Page updated successfully!");
-      // Redirect to the view page if slug changed, otherwise stay on edit page
-      if (finalSlug !== slug) {
-        navigate(`/cms/pages/edit/${finalSlug}`);
-      }
+      // Redirect to the pages list after successful edit
+      navigate("/cms/pages");
     } catch (err: any) {
       console.error("Error saving page:", err);
       alert(`An error occurred: ${err.message}`);
