@@ -433,15 +433,50 @@ const CategoriesModule: React.FC = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="none">None (Root Category)</SelectItem>
-                      {categories.map(
-                        (category) =>
-                          // Don't allow setting itself as parent (for edit mode)
-                          selectedCategory?.id !== category.id && (
-                            <SelectItem key={category.id} value={category.id}>
-                              {category.name_en || category.name}
-                            </SelectItem>
-                          ),
-                      )}
+                      {/* Flatten the category tree for selection */}
+                      {(() => {
+                        // Helper function to flatten the category tree
+                        const flattenCategories = (
+                          cats: Category[],
+                          prefix = "",
+                        ) => {
+                          let result: React.ReactNode[] = [];
+
+                          cats.forEach((category) => {
+                            // Don't allow setting itself as parent (for edit mode)
+                            if (selectedCategory?.id !== category.id) {
+                              result.push(
+                                <SelectItem
+                                  key={category.id}
+                                  value={category.id}
+                                >
+                                  {prefix}
+                                  {category.name_en ||
+                                    category.name} (Level {category.level})
+                                </SelectItem>,
+                              );
+                            }
+
+                            // Add subcategories with indentation
+                            if (
+                              category.subcategories &&
+                              category.subcategories.length > 0
+                            ) {
+                              result = [
+                                ...result,
+                                ...flattenCategories(
+                                  category.subcategories,
+                                  `${prefix}└─ `,
+                                ),
+                              ];
+                            }
+                          });
+
+                          return result;
+                        };
+
+                        return flattenCategories(categories);
+                      })()}
                     </SelectContent>
                   </Select>
                 </div>

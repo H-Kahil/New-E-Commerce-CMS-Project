@@ -1001,7 +1001,7 @@ export const products = {
       const { name_en, name_ar, slug, parent_id, is_active } = categoryData;
 
       // Calculate level based on parent
-      let level = 0;
+      let level = 0; // Default level for root categories
       if (parent_id) {
         const { data: parent } = await supabase
           .from("categories")
@@ -1010,6 +1010,7 @@ export const products = {
           .single();
 
         if (parent) {
+          // Increment parent's level by 1 for the child category
           level = parent.level + 1;
         }
       }
@@ -1051,8 +1052,17 @@ export const products = {
       const { name_en, name_ar, slug, parent_id, is_active } = categoryData;
 
       // Calculate level based on parent
-      let level = 0;
+      let level = 0; // Default level for root categories
       if (parent_id) {
+        // Check if parent_id is the same as the category being updated to prevent circular references
+        if (parent_id === id) {
+          return {
+            data: null,
+            error: new Error("A category cannot be its own parent"),
+          };
+        }
+
+        // Get the parent's level
         const { data: parent } = await supabase
           .from("categories")
           .select("level")
@@ -1060,11 +1070,49 @@ export const products = {
           .single();
 
         if (parent) {
+          // Increment parent's level by 1 for the child category
           level = parent.level + 1;
+        }
+
+        // Check for circular references in the hierarchy
+        let currentParentId = parent_id;
+        const visitedIds = new Set<string>();
+
+        while (currentParentId) {
+          if (visitedIds.has(currentParentId)) {
+            return {
+              data: null,
+              error: new Error(
+                "Circular reference detected in category hierarchy",
+              ),
+            };
+          }
+
+          visitedIds.add(currentParentId);
+
+          const { data: currentParent } = await supabase
+            .from("categories")
+            .select("parent_id")
+            .eq("id", currentParentId)
+            .single();
+
+          if (!currentParent) break;
+          currentParentId = currentParent.parent_id;
+
+          // If we find the category being updated in the parent chain, it's a circular reference
+          if (currentParentId === id) {
+            return {
+              data: null,
+              error: new Error(
+                "Circular reference detected in category hierarchy",
+              ),
+            };
+          }
         }
       }
 
-      return await supabase
+      // Update the category with the calculated level
+      const { data: updatedCategory, error: updateError } = await supabase
         .from("categories")
         .update({
           name: name_en, // Keep for backward compatibility
@@ -1080,9 +1128,52 @@ export const products = {
         .eq("locale", locale)
         .select()
         .single();
+
+      if (updateError) return { data: null, error: updateError };
+
+      // Update levels of all child categories recursively
+      await updateChildCategoryLevels(id, level, locale);
+
+      return { data: updatedCategory, error: null };
     } catch (error) {
       console.error("Error in updateCategory:", error);
       return { data: null, error };
+    }
+  },
+
+  updateChildCategoryLevels: async (
+    parentId: string,
+    parentLevel: number,
+    locale: string,
+  ) => {
+    if (!supabase) return;
+
+    try {
+      // Get all direct children of this parent
+      const { data: children, error } = await supabase
+        .from("categories")
+        .select("id")
+        .eq("parent_id", parentId)
+        .eq("locale", locale);
+
+      if (error || !children || children.length === 0) return;
+
+      // Update each child's level
+      const childLevel = parentLevel + 1;
+
+      for (const child of children) {
+        // Update this child's level
+        await supabase
+          .from("categories")
+          .update({ level: childLevel })
+          .eq("id", child.id)
+          .eq("locale", locale);
+
+        // Recursively update this child's children
+        await products.updateChildCategoryLevels(child.id, childLevel, locale);
+      }
+    } catch (error) {
+      console.error("Error updating child category levels:", error);
     }
   },
 
