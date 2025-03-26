@@ -473,21 +473,43 @@ export const products = {
     }
   },
 
-  getProduct: async (slug: string, locale: string = "en") => {
+  getProduct: async (idOrSlug: string, locale: string = "en") => {
     try {
       if (!supabase)
         return {
           data: null,
           error: new Error("Supabase client not initialized"),
         };
-      return await supabase
+      // Try to fetch by slug first (most common case)
+      const { data, error } = await supabase
         .from("products")
         .select(
           "*, product_categories(*), product_images(*), product_variants(*)",
         )
-        .eq("slug", slug)
+        .eq("slug", idOrSlug)
         .eq("locale", locale)
         .single();
+
+      if (data) return { data, error: null };
+
+      // If not found by slug, try by ID
+      if (error) {
+        // Only try by ID if the error wasn't a connection issue
+        if (error.code === "PGRST116") {
+          const { data: dataById, error: errorById } = await supabase
+            .from("products")
+            .select(
+              "*, product_categories(*), product_images(*), product_variants(*)",
+            )
+            .eq("id", idOrSlug)
+            .eq("locale", locale)
+            .single();
+
+          return { data: dataById, error: errorById };
+        }
+      }
+
+      return { data, error };
     } catch (error) {
       console.error("Error in getProduct:", error);
       return { data: null, error };

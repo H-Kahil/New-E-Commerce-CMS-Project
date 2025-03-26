@@ -212,8 +212,12 @@ const Section = ({ section }: { section: any }) => {
   );
 };
 
+interface CMSPageProps {
+  edit?: boolean;
+}
+
 // Main CMS Page component
-const CMSPage: React.FC = () => {
+const CMSPage: React.FC<CMSPageProps> = ({ edit = false }) => {
   const { slug } = useParams<{ slug: string }>();
   const { t } = useTranslation();
   const { language } = useRtl();
@@ -282,10 +286,24 @@ const CMSPage: React.FC = () => {
       {/* Page header */}
       <div className="bg-gray-50 py-8 mb-8">
         <div className="container mx-auto px-4">
-          <h1 className="text-3xl font-bold">{page.title || "Page Title"}</h1>
-          {page.subtitle && (
-            <p className="text-lg mt-2 text-gray-600">{page.subtitle}</p>
-          )}
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold">
+                {page.title || "Page Title"}
+              </h1>
+              {page.subtitle && (
+                <p className="text-lg mt-2 text-gray-600">{page.subtitle}</p>
+              )}
+            </div>
+            {edit && (
+              <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-md">
+                <p className="font-medium">Edit Mode</p>
+                <p className="text-sm">
+                  Editing functionality will be implemented in a future update.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

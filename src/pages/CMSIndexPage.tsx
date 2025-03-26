@@ -321,7 +321,14 @@ const CMSIndexPage: React.FC = () => {
             <h2 className="text-2xl font-semibold">
               {t("cms.pages") || "Pages"}
             </h2>
-            <Button className="flex items-center gap-2">
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => {
+                alert(
+                  "Create New Page functionality will be implemented in a future update.",
+                );
+              }}
+            >
               <FileText size={16} />
               {t("cms.createNewPage") || "Create New Page"}
             </Button>
@@ -342,14 +349,16 @@ const CMSIndexPage: React.FC = () => {
                       {new Date(page.updated_at).toLocaleDateString()}
                     </span>
                     <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex items-center gap-1"
-                      >
-                        <Edit size={14} />
-                        <span>{t("common.edit") || "Edit"}</span>
-                      </Button>
+                      <Link to={`/cms/page/edit/${page.slug}`}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-1"
+                        >
+                          <Edit size={14} />
+                          <span>{t("common.edit") || "Edit"}</span>
+                        </Button>
+                      </Link>
                       <Link to={`/cms/page/${page.slug}`}>
                         <Button size="sm" className="flex items-center gap-1">
                           <Eye size={14} />
@@ -369,7 +378,14 @@ const CMSIndexPage: React.FC = () => {
             <h2 className="text-2xl font-semibold">
               {t("cms.products") || "Products"}
             </h2>
-            <Button className="flex items-center gap-2">
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => {
+                alert(
+                  "Create New Product functionality will be implemented in a future update.",
+                );
+              }}
+            >
               <Tag size={16} />
               {t("cms.createNewProduct") || "Create New Product"}
             </Button>
@@ -396,6 +412,11 @@ const CMSIndexPage: React.FC = () => {
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-1"
+                        onClick={() => {
+                          alert(
+                            "Edit Product functionality will be implemented in a future update.",
+                          );
+                        }}
                       >
                         <Edit size={14} />
                         <span>{t("common.edit") || "Edit"}</span>
@@ -420,11 +441,26 @@ const CMSIndexPage: React.FC = () => {
               {t("cms.adManagement") || "Ad Management"}
             </h2>
             <div className="flex gap-2">
-              <Button variant="outline" className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                className="flex items-center gap-2"
+                onClick={() => {
+                  alert(
+                    "Create Ad Zone functionality will be implemented in a future update.",
+                  );
+                }}
+              >
                 <LayoutGrid size={16} />
                 {t("cms.createAdZone") || "Create Ad Zone"}
               </Button>
-              <Button className="flex items-center gap-2">
+              <Button
+                className="flex items-center gap-2"
+                onClick={() => {
+                  alert(
+                    "Create New Ad functionality will be implemented in a future update.",
+                  );
+                }}
+              >
                 <Image size={16} />
                 {t("cms.createNewAd") || "Create New Ad"}
               </Button>
@@ -452,6 +488,11 @@ const CMSIndexPage: React.FC = () => {
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-1"
+                        onClick={() => {
+                          alert(
+                            "Edit Ad Zone functionality will be implemented in a future update.",
+                          );
+                        }}
                       >
                         <Edit size={14} />
                         <span>{t("common.edit") || "Edit"}</span>
@@ -475,7 +516,14 @@ const CMSIndexPage: React.FC = () => {
             <h2 className="text-2xl font-semibold">
               {t("cms.menuBuilder") || "Menu Builder"}
             </h2>
-            <Button className="flex items-center gap-2">
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => {
+                alert(
+                  "Create New Menu functionality will be implemented in a future update.",
+                );
+              }}
+            >
               <Menu size={16} />
               {t("cms.createNewMenu") || "Create New Menu"}
             </Button>
@@ -502,6 +550,11 @@ const CMSIndexPage: React.FC = () => {
                         variant="outline"
                         size="sm"
                         className="flex items-center gap-1"
+                        onClick={() => {
+                          alert(
+                            "Edit Menu functionality will be implemented in a future update.",
+                          );
+                        }}
                       >
                         <Edit size={14} />
                         <span>{t("common.edit") || "Edit"}</span>
