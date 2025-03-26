@@ -583,7 +583,9 @@ export const products = {
 
       let query = supabase
         .from("products")
-        .select("*, product_categories(*), product_images(*)")
+        .select(
+          "*, product_categories!inner(*, categories(*)), product_images(*)",
+        )
         .eq("locale", locale);
 
       if (category) {
@@ -618,7 +620,7 @@ export const products = {
       const { data, error } = await supabase
         .from("products")
         .select(
-          "*, product_categories(*), product_images(*), product_variants(*)",
+          "*, product_categories(*, categories(*)), product_images(*), product_variants(*)",
         )
         .eq("slug", idOrSlug)
         .eq("locale", locale)
@@ -633,7 +635,7 @@ export const products = {
           const { data: dataById, error: errorById } = await supabase
             .from("products")
             .select(
-              "*, product_categories(*), product_images(*), product_variants(*)",
+              "*, product_categories(*, categories(*)), product_images(*), product_variants(*)",
             )
             .eq("id", idOrSlug)
             .eq("locale", locale)

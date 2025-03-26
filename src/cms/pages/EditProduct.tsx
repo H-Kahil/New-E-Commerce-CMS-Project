@@ -43,9 +43,9 @@ const EditProduct: React.FC = () => {
         setTitle(data.title || "");
         setSlug(data.slug || "");
         setDescription(data.description || "");
-        setPrice(data.price.toString() || "0.00");
+        setPrice((data.price || 0).toString());
         setSku(data.sku || "");
-        setStock(data.stock.toString() || "0");
+        setStock((data.stock || 0).toString());
       } catch (err: any) {
         console.error("Error fetching product:", err);
         setError(err.message || "Product not found");

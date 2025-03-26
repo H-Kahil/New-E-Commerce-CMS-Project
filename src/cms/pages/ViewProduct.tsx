@@ -129,7 +129,7 @@ const ViewProduct: React.FC = () => {
 
               <div className="mb-4">
                 <span className="text-2xl font-semibold">
-                  ${product.price.toFixed(2)}
+                  ${product.price ? product.price.toFixed(2) : "0.00"}
                 </span>
               </div>
 
@@ -159,7 +159,7 @@ const ViewProduct: React.FC = () => {
                             key={index}
                             className="inline-block px-3 py-1 bg-gray-100 rounded-full text-sm"
                           >
-                            {pc.category_id}
+                            {pc.categories?.name || pc.category_id}
                           </span>
                         ),
                       )}
@@ -205,7 +205,7 @@ const ViewProduct: React.FC = () => {
                     <tr key={variant.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 border-b">{variant.name}</td>
                       <td className="px-4 py-3 border-b">
-                        ${variant.price.toFixed(2)}
+                        ${variant.price ? variant.price.toFixed(2) : "0.00"}
                       </td>
                       <td className="px-4 py-3 border-b">{variant.sku}</td>
                       <td className="px-4 py-3 border-b">{variant.stock}</td>
