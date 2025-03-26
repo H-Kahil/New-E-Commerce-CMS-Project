@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { cms, products } from "../services/supabase";
 import { useRtl } from "../contexts/RtlContext";
@@ -57,6 +57,7 @@ interface Menu {
 const CMSIndexPage: React.FC = () => {
   const { t } = useTranslation();
   const { language } = useRtl();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [pages, setPages] = useState<CMSPage[]>([]);
   const [productsList, setProductsList] = useState<Product[]>([]);
@@ -366,12 +367,13 @@ const CMSIndexPage: React.FC = () => {
             <h2 className="text-2xl font-semibold">
               {t("cms.pages") || "Pages"}
             </h2>
-            <Link to="/cms/page/create">
-              <Button className="flex items-center gap-2">
-                <FileText size={16} />
-                {t("cms.createNewPage") || "Create New Page"}
-              </Button>
-            </Link>
+            <Button
+              className="flex items-center gap-2"
+              onClick={() => navigate("/cms/page/create")}
+            >
+              <FileText size={16} />
+              {t("cms.createNewPage") || "Create New Page"}
+            </Button>
           </div>
 
           {filteredPages.length === 0 ? (

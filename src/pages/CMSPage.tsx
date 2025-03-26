@@ -311,8 +311,6 @@ const CMSPage: React.FC<CMSPageProps> = ({ edit = false, create = false }) => {
   }
 
   // Handle save functionality
-
-  // Handle save functionality
   const handleSave = async () => {
     // Here you would implement the actual save functionality
     // For now, we'll just show a success message

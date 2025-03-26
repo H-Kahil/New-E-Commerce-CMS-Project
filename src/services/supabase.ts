@@ -198,6 +198,20 @@ export const cms = {
           data: null,
           error: new Error("Supabase client not initialized"),
         };
+
+      // Special case for create page
+      if (slug === "create") {
+        return {
+          data: {
+            title: "New Page",
+            slug: "",
+            content: "",
+            sections: [],
+          },
+          error: null,
+        };
+      }
+
       // First get the page
       const { data: page, error: pageError } = await supabase
         .from("cms_pages")
