@@ -313,6 +313,11 @@ const CMSIndexPage: React.FC = () => {
       menu.location.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // Handle create new page button click
+  const handleCreateNewPage = () => {
+    navigate("/cms/page/create");
+  };
+
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex justify-between items-center mb-8">
@@ -369,7 +374,7 @@ const CMSIndexPage: React.FC = () => {
             </h2>
             <Button
               className="flex items-center gap-2"
-              onClick={() => navigate("/cms/page/create")}
+              onClick={handleCreateNewPage}
             >
               <FileText size={16} />
               {t("cms.createNewPage") || "Create New Page"}
@@ -398,22 +403,25 @@ const CMSIndexPage: React.FC = () => {
                         {new Date(page.updated_at).toLocaleDateString()}
                       </span>
                       <div className="flex gap-2">
-                        <Link to={`/cms/page/edit/${page.slug}`}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex items-center gap-1"
-                          >
-                            <Edit size={14} />
-                            <span>{t("common.edit") || "Edit"}</span>
-                          </Button>
-                        </Link>
-                        <Link to={`/cms/page/${page.slug}`}>
-                          <Button size="sm" className="flex items-center gap-1">
-                            <Eye size={14} />
-                            <span>{t("common.view") || "View"}</span>
-                          </Button>
-                        </Link>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() =>
+                            navigate(`/cms/page/edit/${page.slug}`)
+                          }
+                        >
+                          <Edit size={14} />
+                          <span>{t("common.edit") || "Edit"}</span>
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => navigate(`/cms/page/${page.slug}`)}
+                        >
+                          <Eye size={14} />
+                          <span>{t("common.view") || "View"}</span>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -481,12 +489,14 @@ const CMSIndexPage: React.FC = () => {
                           <Edit size={14} />
                           <span>{t("common.edit") || "Edit"}</span>
                         </Button>
-                        <Link to={`/product/${product.slug}`}>
-                          <Button size="sm" className="flex items-center gap-1">
-                            <Eye size={14} />
-                            <span>{t("common.view") || "View"}</span>
-                          </Button>
-                        </Link>
+                        <Button
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => navigate(`/product/${product.slug}`)}
+                        >
+                          <Eye size={14} />
+                          <span>{t("common.view") || "View"}</span>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -566,12 +576,14 @@ const CMSIndexPage: React.FC = () => {
                           <Edit size={14} />
                           <span>{t("common.edit") || "Edit"}</span>
                         </Button>
-                        <Link to={`/cms/ads/${zone.id}`}>
-                          <Button size="sm" className="flex items-center gap-1">
-                            <Eye size={14} />
-                            <span>{t("common.view") || "View"}</span>
-                          </Button>
-                        </Link>
+                        <Button
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => navigate(`/cms/ads/${zone.id}`)}
+                        >
+                          <Eye size={14} />
+                          <span>{t("common.view") || "View"}</span>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -636,12 +648,14 @@ const CMSIndexPage: React.FC = () => {
                           <Edit size={14} />
                           <span>{t("common.edit") || "Edit"}</span>
                         </Button>
-                        <Link to={`/cms/menus/${menu.id}`}>
-                          <Button size="sm" className="flex items-center gap-1">
-                            <Eye size={14} />
-                            <span>{t("common.view") || "View"}</span>
-                          </Button>
-                        </Link>
+                        <Button
+                          size="sm"
+                          className="flex items-center gap-1"
+                          onClick={() => navigate(`/cms/menus/${menu.id}`)}
+                        >
+                          <Eye size={14} />
+                          <span>{t("common.view") || "View"}</span>
+                        </Button>
                       </div>
                     </div>
                   </div>
@@ -655,4 +669,5 @@ const CMSIndexPage: React.FC = () => {
   );
 };
 
+export { CMSIndexPage };
 export default CMSIndexPage;

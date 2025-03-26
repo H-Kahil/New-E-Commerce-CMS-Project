@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useRtl } from "../contexts/RtlContext";
 
@@ -7,6 +7,7 @@ import { useRtl } from "../contexts/RtlContext";
 import Header from "../shared/components/Header";
 import Footer from "../shared/components/Footer";
 import { cms } from "../services/supabase";
+import { MenuProvider } from "../contexts/MenuContext";
 
 interface AdZone {
   id: string;
@@ -69,8 +70,14 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { t } = useTranslation();
   const { direction, language } = useRtl();
   const [adZones, setAdZones] = useState<Record<string, AdZone>>({});
+  const location = useLocation();
+
+  // Check if the current route is a CMS route
+  const isCmsRoute = location.pathname.startsWith("/cms");
 
   useEffect(() => {
+    // Only fetch ad zones if not on a CMS route
+    if (isCmsRoute) return;
     const fetchAdZones = async () => {
       try {
         const { data, error } = await cms.getAdZones(language);
@@ -99,34 +106,41 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     fetchAdZones();
   }, [language]);
 
+  // If it's a CMS route, don't show the header and footer
+  if (isCmsRoute) {
+    return <Outlet />;
+  }
+
   return (
-    <div className="flex min-h-screen flex-col bg-white" dir={direction}>
-      <Header />
+    <MenuProvider>
+      <div className="flex min-h-screen flex-col bg-white" dir={direction}>
+        <Header />
 
-      {/* Top ad zone */}
-      {adZones["site-top"] && <AdComponent adZone={adZones["site-top"]} />}
+        {/* Top ad zone */}
+        {adZones["site-top"] && <AdComponent adZone={adZones["site-top"]} />}
 
-      <main className="flex-1">
-        {/* Before content ad zone */}
-        {adZones["content-top"] && (
-          <AdComponent adZone={adZones["content-top"]} />
+        <main className="flex-1">
+          {/* Before content ad zone */}
+          {adZones["content-top"] && (
+            <AdComponent adZone={adZones["content-top"]} />
+          )}
+
+          {children || <Outlet />}
+
+          {/* After content ad zone */}
+          {adZones["content-bottom"] && (
+            <AdComponent adZone={adZones["content-bottom"]} />
+          )}
+        </main>
+
+        {/* Before footer ad zone */}
+        {adZones["before-footer"] && (
+          <AdComponent adZone={adZones["before-footer"]} />
         )}
 
-        {children || <Outlet />}
-
-        {/* After content ad zone */}
-        {adZones["content-bottom"] && (
-          <AdComponent adZone={adZones["content-bottom"]} />
-        )}
-      </main>
-
-      {/* Before footer ad zone */}
-      {adZones["before-footer"] && (
-        <AdComponent adZone={adZones["before-footer"]} />
-      )}
-
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </MenuProvider>
   );
 };
 

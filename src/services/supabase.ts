@@ -220,7 +220,13 @@ export const cms = {
         .eq("locale", locale)
         .single();
 
-      if (pageError || !page) return { data: null, error: pageError };
+      if (pageError || !page) {
+        console.error("Error fetching page:", pageError);
+        return {
+          data: null,
+          error: pageError || new Error(`Page with slug '${slug}' not found`),
+        };
+      }
 
       // Get sections for this page
       const { data: sections, error: sectionsError } = await supabase
@@ -229,8 +235,10 @@ export const cms = {
         .eq("page_id", page.id)
         .eq("locale", locale);
 
-      if (sectionsError)
+      if (sectionsError) {
+        console.error("Error fetching sections:", sectionsError);
         return { data: { ...page, sections: [] }, error: sectionsError };
+      }
 
       // Get blocks for each section
       const sectionsWithBlocks = await Promise.all(
@@ -240,6 +248,10 @@ export const cms = {
             .select("*")
             .eq("section_id", section.id)
             .eq("locale", locale);
+
+          if (blocksError) {
+            console.error("Error fetching blocks:", blocksError);
+          }
 
           return {
             ...section,
@@ -429,6 +441,114 @@ export const cms = {
         .order("created_at", { ascending: false });
     } catch (error) {
       console.error("Error in getMedia:", error);
+      return { data: null, error };
+    }
+  },
+  createPage: async (pageData: any, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      const { title, slug, content, sections = [] } = pageData;
+
+      // Insert the page
+      const { data: page, error: pageError } = await supabase
+        .from("cms_pages")
+        .insert([
+          {
+            title,
+            slug,
+            content,
+            locale,
+          },
+        ])
+        .select()
+        .single();
+
+      if (pageError) {
+        console.error("Error creating page:", pageError);
+        return { data: null, error: pageError };
+      }
+
+      // Insert sections if any
+      if (sections.length > 0 && page) {
+        const sectionsWithPageId = sections.map((section: any) => ({
+          ...section,
+          page_id: page.id,
+          locale,
+        }));
+
+        const { data: insertedSections, error: sectionsError } = await supabase
+          .from("cms_sections")
+          .insert(sectionsWithPageId)
+          .select();
+
+        if (sectionsError) {
+          console.error("Error creating sections:", sectionsError);
+          // Continue with the page creation even if sections fail
+        }
+
+        // Return the page with sections
+        return {
+          data: {
+            ...page,
+            sections: insertedSections || [],
+          },
+          error: null,
+        };
+      }
+
+      return { data: page, error: null };
+    } catch (error) {
+      console.error("Error in createPage:", error);
+      return { data: null, error };
+    }
+  },
+  updatePage: async (slug: string, pageData: any, locale: string = "en") => {
+    try {
+      if (!supabase)
+        return {
+          data: null,
+          error: new Error("Supabase client not initialized"),
+        };
+
+      // First get the page to update
+      const { data: existingPage, error: getError } = await supabase
+        .from("cms_pages")
+        .select("*")
+        .eq("slug", slug)
+        .eq("locale", locale)
+        .single();
+
+      if (getError) {
+        console.error("Error finding page to update:", getError);
+        return { data: null, error: getError };
+      }
+
+      // Update the page
+      const { data: updatedPage, error: updateError } = await supabase
+        .from("cms_pages")
+        .update({
+          title: pageData.title,
+          slug: pageData.slug,
+          content: pageData.content,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingPage.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        console.error("Error updating page:", updateError);
+        return { data: null, error: updateError };
+      }
+
+      return { data: updatedPage, error: null };
+    } catch (error) {
+      console.error("Error in updatePage:", error);
       return { data: null, error };
     }
   },
