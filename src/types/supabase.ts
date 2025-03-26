@@ -948,6 +948,7 @@ export type Database = {
           review_count: number | null
           sale_price: number | null
           shipping_info: Json | null
+          sku: string | null
           slug: string
           specifications: Json | null
           title: string
@@ -980,6 +981,7 @@ export type Database = {
           review_count?: number | null
           sale_price?: number | null
           shipping_info?: Json | null
+          sku?: string | null
           slug: string
           specifications?: Json | null
           title: string
@@ -1012,6 +1014,7 @@ export type Database = {
           review_count?: number | null
           sale_price?: number | null
           shipping_info?: Json | null
+          sku?: string | null
           slug?: string
           specifications?: Json | null
           title?: string
