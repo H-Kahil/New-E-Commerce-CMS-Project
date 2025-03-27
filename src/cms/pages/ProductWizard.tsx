@@ -37,37 +37,42 @@ const ProductWizard: React.FC = () => {
     title: "New Product",
     slug: "",
     description: "",
-    price: "0.00",
-    sale_price: "",
-    compare_at_price: "",
     sku: "",
-    stock: "0",
-    availability_status: "in_stock",
-    is_new: false,
-    is_on_sale: false,
-    is_featured: false,
-
-    // Details
+    is_active: true,
     brand: "",
     model: "",
-    color: "",
-    dimensions: "",
-    weight: "",
-    warranty: "",
-
-    // Features & Specs
-    features: [""],
-    specifications: [{ key: "", value: "" }],
+    family: "",
+    is_new: false,
+    is_featured: false,
 
     // Categories
     categories: [],
     parent_category: "",
     sub_category: "",
 
-    // SEO
+    // Attributes & Variants
+    color: "",
+    attributes: [],
+    variants: [],
+
+    // Pricing & Inventory
+    price: "0.00",
+    sale_price: "",
+    compare_at_price: "",
+    stock: "0",
+    min_order_quantity: "1",
+    is_on_sale: false,
+
+    // Specifications & Metadata
+    dimensions: "",
+    weight: "",
+    warranty: "",
+    features: [""],
+    specifications: [{ key: "", value: "" }],
     meta_title: "",
     meta_description: "",
     meta_keywords: "",
+    tags: "",
 
     // Images
     images: [],
@@ -301,8 +306,10 @@ const ProductWizard: React.FC = () => {
             : null,
           sku: productData.sku,
           stock: parseInt(productData.stock, 10),
+          min_order_quantity: parseInt(productData.min_order_quantity, 10),
           brand: productData.brand,
           model: productData.model,
+          family: productData.family,
           color: productData.color,
           dimensions: productData.dimensions,
           weight: productData.weight,
@@ -310,15 +317,18 @@ const ProductWizard: React.FC = () => {
           is_new: productData.is_new,
           is_on_sale: productData.is_on_sale,
           is_featured: productData.is_featured,
-          availability_status: productData.availability_status,
+          is_active: productData.is_active,
           meta_title: productData.meta_title || productData.title,
           meta_description:
             productData.meta_description || productData.description,
           meta_keywords: productData.meta_keywords,
+          tags: productData.tags,
           features: filteredFeatures,
           specifications: specsObject,
           categories: productData.categories.filter((c) => c), // Filter out empty values
           images: productData.images,
+          attributes: productData.attributes,
+          variants: productData.variants,
         },
         language,
       );
@@ -343,7 +353,7 @@ const ProductWizard: React.FC = () => {
   // Wizard steps
   const wizardSteps = [
     {
-      title: t("cms.products.basicInfo", "Basic Info"),
+      title: t("cms.products.basicInfo", "Basic Information"),
       description: t(
         "cms.products.basicInfoDesc",
         "Enter the essential product information",
@@ -355,7 +365,7 @@ const ProductWizard: React.FC = () => {
               htmlFor="productTitle"
               className="block text-sm font-medium mb-1"
             >
-              {t("cms.products.productTitle", "Product Title")}
+              {t("cms.products.productTitle", "Product Name")}
             </Label>
             <Input
               type="text"
@@ -408,64 +418,6 @@ const ProductWizard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label
-                htmlFor="productPrice"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.price", "Price")}
-              </Label>
-              <Input
-                type="number"
-                id="productPrice"
-                value={productData.price}
-                onChange={(e) => handleChange("price", e.target.value)}
-                className="w-full"
-                step="0.01"
-                min="0"
-              />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="productSalePrice"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.salePrice", "Sale Price")}
-              </Label>
-              <Input
-                type="number"
-                id="productSalePrice"
-                value={productData.sale_price}
-                onChange={(e) => handleChange("sale_price", e.target.value)}
-                className="w-full"
-                step="0.01"
-                min="0"
-              />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="productComparePrice"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.compareAtPrice", "Compare At Price")}
-              </Label>
-              <Input
-                type="number"
-                id="productComparePrice"
-                value={productData.compare_at_price}
-                onChange={(e) =>
-                  handleChange("compare_at_price", e.target.value)
-                }
-                className="w-full"
-                step="0.01"
-                min="0"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label
                 htmlFor="productSku"
                 className="block text-sm font-medium mb-1"
               >
@@ -482,62 +434,51 @@ const ProductWizard: React.FC = () => {
 
             <div>
               <Label
-                htmlFor="productStock"
+                htmlFor="productBrand"
                 className="block text-sm font-medium mb-1"
               >
-                {t("cms.products.stock", "Stock")}
+                {t("cms.products.brand", "Brand")}
               </Label>
               <Input
-                type="number"
-                id="productStock"
-                value={productData.stock}
-                onChange={(e) => handleChange("stock", e.target.value)}
+                type="text"
+                id="productBrand"
+                value={productData.brand}
+                onChange={(e) => handleChange("brand", e.target.value)}
                 className="w-full"
-                min="0"
-                step="1"
               />
             </div>
 
             <div>
               <Label
-                htmlFor="productAvailability"
+                htmlFor="productModel"
                 className="block text-sm font-medium mb-1"
               >
-                {t("cms.products.availability", "Availability")}
+                {t("cms.products.model", "Model")}
               </Label>
-              <Select
-                value={productData.availability_status}
-                onValueChange={(value) =>
-                  handleChange("availability_status", value)
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue
-                    placeholder={t(
-                      "cms.products.selectAvailability",
-                      "Select availability",
-                    )}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="in_stock">
-                    {t("cms.products.inStock", "In Stock")}
-                  </SelectItem>
-                  <SelectItem value="out_of_stock">
-                    {t("cms.products.outOfStock", "Out of Stock")}
-                  </SelectItem>
-                  <SelectItem value="backorder">
-                    {t("cms.products.backorder", "Backorder")}
-                  </SelectItem>
-                  <SelectItem value="preorder">
-                    {t("cms.products.preorder", "Pre-order")}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              <Input
+                type="text"
+                id="productModel"
+                value={productData.model}
+                onChange={(e) => handleChange("model", e.target.value)}
+                className="w-full"
+              />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="isActive"
+                checked={productData.is_active}
+                onCheckedChange={(checked) =>
+                  handleChange("is_active", checked)
+                }
+              />
+              <Label htmlFor="isActive">
+                {t("cms.products.isActive", "Active")}
+              </Label>
+            </div>
+
             <div className="flex items-center space-x-2">
               <Switch
                 id="isNew"
@@ -546,19 +487,6 @@ const ProductWizard: React.FC = () => {
               />
               <Label htmlFor="isNew">
                 {t("cms.products.isNew", "Mark as New")}
-              </Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="isOnSale"
-                checked={productData.is_on_sale}
-                onCheckedChange={(checked) =>
-                  handleChange("is_on_sale", checked)
-                }
-              />
-              <Label htmlFor="isOnSale">
-                {t("cms.products.isOnSale", "On Sale")}
               </Label>
             </div>
 
@@ -573,6 +501,39 @@ const ProductWizard: React.FC = () => {
               <Label htmlFor="isFeatured">
                 {t("cms.products.isFeatured", "Featured Product")}
               </Label>
+            </div>
+          </div>
+
+          <div>
+            <Label
+              htmlFor="productFamily"
+              className="block text-sm font-medium mb-1"
+            >
+              {t("cms.products.family", "Product Family")}
+            </Label>
+            <Input
+              type="text"
+              id="productFamily"
+              value={productData.family}
+              onChange={(e) => handleChange("family", e.target.value)}
+              className="w-full"
+            />
+          </div>
+
+          <div className="mt-4">
+            <Label className="block text-sm font-medium mb-3">
+              {t("cms.products.mainImage", "Main Product Image")}
+            </Label>
+            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+              <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleImageUpload}
+              >
+                {t("cms.products.uploadMainImage", "Upload Main Image")}
+              </Button>
             </div>
           </div>
         </div>
@@ -669,123 +630,237 @@ const ProductWizard: React.FC = () => {
       ),
     },
     {
-      title: t("cms.products.details", "Details"),
+      title: t("cms.products.attributesVariants", "Attributes & Variants"),
       description: t(
-        "cms.products.detailsDesc",
-        "Add detailed product information",
+        "cms.products.attributesVariantsDesc",
+        "Define product attributes and variants",
       ),
       content: (
         <div className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label
-                htmlFor="productBrand"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.brand", "Brand")}
-              </Label>
-              <Input
-                type="text"
-                id="productBrand"
-                value={productData.brand}
-                onChange={(e) => handleChange("brand", e.target.value)}
-                className="w-full"
-              />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="productModel"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.model", "Model")}
-              </Label>
-              <Input
-                type="text"
-                id="productModel"
-                value={productData.model}
-                onChange={(e) => handleChange("model", e.target.value)}
-                className="w-full"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label
-                htmlFor="productColor"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.color", "Color")}
-              </Label>
-              <Input
-                type="text"
-                id="productColor"
-                value={productData.color}
-                onChange={(e) => handleChange("color", e.target.value)}
-                className="w-full"
-              />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="productDimensions"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.dimensions", "Dimensions")}
-              </Label>
-              <Input
-                type="text"
-                id="productDimensions"
-                value={productData.dimensions}
-                onChange={(e) => handleChange("dimensions", e.target.value)}
-                className="w-full"
-                placeholder="e.g. 10 x 5 x 2 inches"
-              />
-            </div>
-
-            <div>
-              <Label
-                htmlFor="productWeight"
-                className="block text-sm font-medium mb-1"
-              >
-                {t("cms.products.weight", "Weight")}
-              </Label>
-              <Input
-                type="text"
-                id="productWeight"
-                value={productData.weight}
-                onChange={(e) => handleChange("weight", e.target.value)}
-                className="w-full"
-                placeholder="e.g. 2.5 lbs"
-              />
-            </div>
-          </div>
-
           <div>
             <Label
-              htmlFor="productWarranty"
+              htmlFor="productColor"
               className="block text-sm font-medium mb-1"
             >
-              {t("cms.products.warranty", "Warranty Information")}
+              {t("cms.products.color", "Color")}
             </Label>
             <Input
               type="text"
-              id="productWarranty"
-              value={productData.warranty}
-              onChange={(e) => handleChange("warranty", e.target.value)}
+              id="productColor"
+              value={productData.color}
+              onChange={(e) => handleChange("color", e.target.value)}
               className="w-full"
-              placeholder="e.g. 1 Year Limited Warranty"
+              placeholder="e.g. Red, Blue, Green (comma separated)"
             />
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-base font-medium mb-3">
+              {t("cms.products.additionalAttributes", "Additional Attributes")}
+            </h3>
+            <div className="space-y-3">
+              {productData.specifications.slice(0, 3).map((spec, index) => (
+                <div key={index} className="flex items-center gap-2">
+                  <Input
+                    type="text"
+                    value={spec.key}
+                    onChange={(e) =>
+                      updateSpecification(index, "key", e.target.value)
+                    }
+                    placeholder={t(
+                      "cms.products.attributeName",
+                      "Attribute name (e.g. Size)",
+                    )}
+                    className="flex-1"
+                  />
+                  <Input
+                    type="text"
+                    value={spec.value}
+                    onChange={(e) =>
+                      updateSpecification(index, "value", e.target.value)
+                    }
+                    placeholder={t(
+                      "cms.products.attributeValues",
+                      "Values (e.g. S,M,L,XL)",
+                    )}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeSpecification(index)}
+                    disabled={productData.specifications.length <= 1}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-3"
+              onClick={addSpecification}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              {t("cms.products.addAttribute", "Add Attribute")}
+            </Button>
+          </div>
+
+          <div className="mt-6">
+            <h3 className="text-base font-medium mb-3">
+              {t("cms.products.variantImages", "Variant Images")}
+            </h3>
+            <div className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-muted-foreground/25 rounded-lg">
+              <Upload className="h-10 w-10 text-muted-foreground mb-2" />
+              <p className="text-sm text-muted-foreground mb-1">
+                {t(
+                  "cms.products.dragVariantImages",
+                  "Upload images for different variants",
+                )}
+              </p>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={handleImageUpload}
+              >
+                {t("cms.products.uploadVariantImages", "Upload Variant Images")}
+              </Button>
+            </div>
           </div>
         </div>
       ),
     },
     {
-      title: t("cms.products.featuresSpecs", "Features & Specs"),
+      title: t("cms.products.pricingInventory", "Pricing & Inventory"),
       description: t(
-        "cms.products.featuresSpecsDesc",
-        "Add product features and specifications",
+        "cms.products.pricingInventoryDesc",
+        "Set pricing and inventory information",
+      ),
+      content: (
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <Label
+                htmlFor="productPrice"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("cms.products.price", "Regular Price")}
+              </Label>
+              <Input
+                type="number"
+                id="productPrice"
+                value={productData.price}
+                onChange={(e) => handleChange("price", e.target.value)}
+                className="w-full"
+                step="0.01"
+                min="0"
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="productSalePrice"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("cms.products.salePrice", "Sale Price")}
+              </Label>
+              <Input
+                type="number"
+                id="productSalePrice"
+                value={productData.sale_price}
+                onChange={(e) => handleChange("sale_price", e.target.value)}
+                className="w-full"
+                step="0.01"
+                min="0"
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="productComparePrice"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("cms.products.compareAtPrice", "Compare At Price")}
+              </Label>
+              <Input
+                type="number"
+                id="productComparePrice"
+                value={productData.compare_at_price}
+                onChange={(e) =>
+                  handleChange("compare_at_price", e.target.value)
+                }
+                className="w-full"
+                step="0.01"
+                min="0"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label
+                htmlFor="productStock"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("cms.products.stock", "Stock Quantity")}
+              </Label>
+              <Input
+                type="number"
+                id="productStock"
+                value={productData.stock}
+                onChange={(e) => handleChange("stock", e.target.value)}
+                className="w-full"
+                min="0"
+                step="1"
+              />
+            </div>
+
+            <div>
+              <Label
+                htmlFor="minOrderQuantity"
+                className="block text-sm font-medium mb-1"
+              >
+                {t("cms.products.minOrderQuantity", "Minimum Order Quantity")}
+              </Label>
+              <Input
+                type="number"
+                id="minOrderQuantity"
+                value={productData.min_order_quantity}
+                onChange={(e) =>
+                  handleChange("min_order_quantity", e.target.value)
+                }
+                className="w-full"
+                min="1"
+                step="1"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-2 pt-2">
+            <Switch
+              id="isOnSale"
+              checked={productData.is_on_sale}
+              onCheckedChange={(checked) => handleChange("is_on_sale", checked)}
+            />
+            <Label htmlFor="isOnSale">
+              {t("cms.products.isOnSale", "On Sale")}
+            </Label>
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: t(
+        "cms.products.specificationsMetadata",
+        "Specifications & Metadata",
+      ),
+      description: t(
+        "cms.products.specificationsMetadataDesc",
+        "Add technical specifications and metadata",
       ),
       content: (
         <div className="space-y-6">
@@ -834,16 +909,79 @@ const ProductWizard: React.FC = () => {
 
           <div>
             <h3 className="text-base font-medium mb-3">
-              {t("cms.products.specifications", "Specifications")}
+              {t(
+                "cms.products.technicalSpecifications",
+                "Technical Specifications",
+              )}
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label
+                  htmlFor="productDimensions"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.dimensions", "Dimensions")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productDimensions"
+                  value={productData.dimensions}
+                  onChange={(e) => handleChange("dimensions", e.target.value)}
+                  className="w-full"
+                  placeholder="e.g. 10 x 5 x 2 inches"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="productWeight"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.weight", "Weight")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productWeight"
+                  value={productData.weight}
+                  onChange={(e) => handleChange("weight", e.target.value)}
+                  className="w-full"
+                  placeholder="e.g. 2.5 lbs"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="productWarranty"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.warranty", "Warranty")}
+                </Label>
+                <Input
+                  type="text"
+                  id="productWarranty"
+                  value={productData.warranty}
+                  onChange={(e) => handleChange("warranty", e.target.value)}
+                  className="w-full"
+                  placeholder="e.g. 1 Year Limited Warranty"
+                />
+              </div>
+            </div>
+          </div>
+
+          <Separator className="my-4" />
+
+          <div>
+            <h3 className="text-base font-medium mb-3">
+              {t("cms.products.specifications", "Additional Specifications")}
             </h3>
             <div className="space-y-3">
-              {productData.specifications.map((spec, index) => (
-                <div key={index} className="flex items-center gap-2">
+              {productData.specifications.slice(3).map((spec, index) => (
+                <div key={index + 3} className="flex items-center gap-2">
                   <Input
                     type="text"
                     value={spec.key}
                     onChange={(e) =>
-                      updateSpecification(index, "key", e.target.value)
+                      updateSpecification(index + 3, "key", e.target.value)
                     }
                     placeholder={t(
                       "cms.products.specNamePlaceholder",
@@ -855,7 +993,7 @@ const ProductWizard: React.FC = () => {
                     type="text"
                     value={spec.value}
                     onChange={(e) =>
-                      updateSpecification(index, "value", e.target.value)
+                      updateSpecification(index + 3, "value", e.target.value)
                     }
                     placeholder={t(
                       "cms.products.specValuePlaceholder",
@@ -867,8 +1005,7 @@ const ProductWizard: React.FC = () => {
                     type="button"
                     variant="outline"
                     size="icon"
-                    onClick={() => removeSpecification(index)}
-                    disabled={productData.specifications.length <= 1}
+                    onClick={() => removeSpecification(index + 3)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -885,6 +1022,103 @@ const ProductWizard: React.FC = () => {
               <Plus className="h-4 w-4 mr-1" />
               {t("cms.products.addSpecification", "Add Specification")}
             </Button>
+          </div>
+
+          <Separator className="my-4" />
+
+          <div>
+            <h3 className="text-base font-medium mb-3">
+              {t("cms.products.metadataSEO", "Metadata for SEO")}
+            </h3>
+            <div className="space-y-4">
+              <div>
+                <Label
+                  htmlFor="metaTitle"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.metaTitle", "Meta Title")}
+                  <span className="text-xs text-muted-foreground ml-1">
+                    (
+                    {t(
+                      "cms.products.metaTitleInfo",
+                      "Leave empty to use product title",
+                    )}
+                    )
+                  </span>
+                </Label>
+                <Input
+                  type="text"
+                  id="metaTitle"
+                  value={productData.meta_title}
+                  onChange={(e) => handleChange("meta_title", e.target.value)}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="metaDescription"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.metaDescription", "Meta Description")}
+                </Label>
+                <Textarea
+                  id="metaDescription"
+                  value={productData.meta_description}
+                  onChange={(e) =>
+                    handleChange("meta_description", e.target.value)
+                  }
+                  className="w-full h-24"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="metaKeywords"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.metaKeywords", "Meta Keywords")}
+                  <span className="text-xs text-muted-foreground ml-1">
+                    (
+                    {t(
+                      "cms.products.metaKeywordsInfo",
+                      "Comma-separated keywords",
+                    )}
+                    )
+                  </span>
+                </Label>
+                <Input
+                  type="text"
+                  id="metaKeywords"
+                  value={productData.meta_keywords}
+                  onChange={(e) =>
+                    handleChange("meta_keywords", e.target.value)
+                  }
+                  className="w-full"
+                  placeholder="keyword1, keyword2, keyword3"
+                />
+              </div>
+
+              <div>
+                <Label
+                  htmlFor="tags"
+                  className="block text-sm font-medium mb-1"
+                >
+                  {t("cms.products.tags", "Tags")}
+                  <span className="text-xs text-muted-foreground ml-1">
+                    ({t("cms.products.tagsInfo", "Comma-separated tags")})
+                  </span>
+                </Label>
+                <Input
+                  type="text"
+                  id="tags"
+                  value={productData.tags}
+                  onChange={(e) => handleChange("tags", e.target.value)}
+                  className="w-full"
+                  placeholder="tag1, tag2, tag3"
+                />
+              </div>
+            </div>
           </div>
         </div>
       ),
@@ -942,111 +1176,7 @@ const ProductWizard: React.FC = () => {
         </div>
       ),
     },
-    {
-      title: t("cms.products.seo", "SEO"),
-      description: t("cms.products.seoDesc", "Optimize for search engines"),
-      content: (
-        <div className="space-y-4">
-          <div>
-            <Label
-              htmlFor="metaTitle"
-              className="block text-sm font-medium mb-1"
-            >
-              {t("cms.products.metaTitle", "Meta Title")}
-              <span className="text-xs text-muted-foreground ml-1">
-                (
-                {t(
-                  "cms.products.metaTitleInfo",
-                  "Leave empty to use product title",
-                )}
-                )
-              </span>
-            </Label>
-            <Input
-              type="text"
-              id="metaTitle"
-              value={productData.meta_title}
-              onChange={(e) => handleChange("meta_title", e.target.value)}
-              className="w-full"
-            />
-          </div>
 
-          <div>
-            <Label
-              htmlFor="metaDescription"
-              className="block text-sm font-medium mb-1"
-            >
-              {t("cms.products.metaDescription", "Meta Description")}
-              <span className="text-xs text-muted-foreground ml-1">
-                (
-                {t(
-                  "cms.products.metaDescriptionInfo",
-                  "Leave empty to use product description",
-                )}
-                )
-              </span>
-            </Label>
-            <Textarea
-              id="metaDescription"
-              value={productData.meta_description}
-              onChange={(e) => handleChange("meta_description", e.target.value)}
-              className="w-full h-24"
-            />
-          </div>
-
-          <div>
-            <Label
-              htmlFor="metaKeywords"
-              className="block text-sm font-medium mb-1"
-            >
-              {t("cms.products.metaKeywords", "Meta Keywords")}
-              <span className="text-xs text-muted-foreground ml-1">
-                (
-                {t("cms.products.metaKeywordsInfo", "Comma-separated keywords")}
-                )
-              </span>
-            </Label>
-            <Input
-              type="text"
-              id="metaKeywords"
-              value={productData.meta_keywords}
-              onChange={(e) => handleChange("meta_keywords", e.target.value)}
-              className="w-full"
-              placeholder="keyword1, keyword2, keyword3"
-            />
-          </div>
-
-          <div className="p-4 bg-muted rounded-md flex items-start gap-3 mt-4">
-            <AlertCircle className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-muted-foreground">
-              <p className="font-medium mb-1">
-                {t("cms.products.seoTips", "SEO Tips")}
-              </p>
-              <ul className="list-disc pl-5 space-y-1">
-                <li>
-                  {t(
-                    "cms.products.seoTip1",
-                    "Keep meta titles under 60 characters",
-                  )}
-                </li>
-                <li>
-                  {t(
-                    "cms.products.seoTip2",
-                    "Meta descriptions should be 120-160 characters",
-                  )}
-                </li>
-                <li>
-                  {t(
-                    "cms.products.seoTip3",
-                    "Use relevant keywords in both title and description",
-                  )}
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      ),
-    },
     {
       title: t("cms.products.review", "Review & Submit"),
       description: t(

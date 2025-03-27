@@ -190,16 +190,10 @@ const ProductsModule: React.FC = () => {
                     {t("cms.products.subCategoryColumn", "Sub Category")}
                   </th>
                   <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.quantityColumn", "Quantity")}
-                  </th>
-                  <th className="px-4 py-2 text-left border-b">
                     {t("cms.products.costColumn", "Cost ($)")}
                   </th>
                   <th className="px-4 py-2 text-left border-b">
                     {t("cms.products.priceColumn", "Price ($)")}
-                  </th>
-                  <th className="px-4 py-2 text-left border-b">
-                    {t("cms.products.statusColumn", "Status")}
                   </th>
                   <th className="px-4 py-2 text-center border-b">
                     {t("cms.products.actionsColumn", "Actions")}
@@ -255,15 +249,9 @@ const ProductsModule: React.FC = () => {
                       <td className="px-4 py-3 border-b">{product.title}</td>
                       <td className="px-4 py-3 border-b">{category}</td>
                       <td className="px-4 py-3 border-b">{subCategory}</td>
-                      <td className="px-4 py-3 border-b">
-                        {product.stock || 0}
-                      </td>
                       <td className="px-4 py-3 border-b">${cost}</td>
                       <td className="px-4 py-3 border-b">
                         ${product.price.toFixed(2)}
-                      </td>
-                      <td className="px-4 py-3 border-b">
-                        {getStockStatus(product.stock)}
                       </td>
                       <td className="px-4 py-3 border-b">
                         <div className="flex justify-center space-x-2">
